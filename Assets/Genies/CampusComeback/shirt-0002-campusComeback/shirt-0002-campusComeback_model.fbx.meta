@@ -1,7 +1,14 @@
 fileFormatVersion: 2
 guid: d430680c45add4751856a7f3303e7fdd
+AssetOrigin:
+  serializedVersion: 1
+  productId: 350376
+  packageName: Campus Comeback Set - Genies Avatar Clothing Pack
+  packageVersion: 1.0
+  assetPath: Assets/Genies/CampusComeback/shirt-0002-campusComeback/shirt-0002-campusComeback_model.fbx
+  uploadId: 834462
 ModelImporter:
-  serializedVersion: 22200
+  serializedVersion: 24200
   internalIDToNameTable: []
   externalObjects: {}
   materials:
@@ -16,8 +23,6 @@ ModelImporter:
     optimizeGameObjects: 0
     removeConstantScaleCurves: 0
     motionNodeName: 
-    rigImportErrors: 
-    rigImportWarnings: 
     animationImportErrors: 
     animationImportWarnings: 
     animationRetargetingWarnings: 
@@ -36,7 +41,7 @@ ModelImporter:
   meshes:
     lODScreenPercentages: []
     globalScale: 1
-    meshCompression: 0
+    meshCompression: 3
     addColliders: 0
     useSRGBMaterialColor: 1
     sortHierarchyByName: 1
@@ -58,6 +63,9 @@ ModelImporter:
     maxBonesPerVertex: 4
     minBoneWeight: 0.001
     optimizeBones: 1
+    generateMeshLods: 1
+    meshLodGenerationFlags: 0
+    maximumMeshLod: -1
     meshOptimizationFlags: -1
     indexFormat: 0
     secondaryUVAngleDistortion: 8
@@ -107,10 +115,3 @@ ModelImporter:
   userData: 
   assetBundleName: 
   assetBundleVariant: 
-AssetOrigin:
-  serializedVersion: 1
-  productId: 350376
-  packageName: Campus Comeback Set - Genies Avatar Clothing Pack
-  packageVersion: 1.0
-  assetPath: Assets/Genies/CampusComeback/shirt-0002-campusComeback/shirt-0002-campusComeback_model.fbx
-  uploadId: 834462

@@ -1,12 +1,5 @@
 fileFormatVersion: 2
-guid: 4530efe8a35bc954e9a347c1627e2bee
-AssetOrigin:
-  serializedVersion: 1
-  productId: 247739
-  packageName: Outdoor Wall Tile Texture Pack (LR)
-  packageVersion: 1.0
-  assetPath: Assets/Phoenix3D/Textures/Outdoor_Wall_T03/Outdoor_Wall_T03_Roughness.png
-  uploadId: 570291
+guid: 20a4cef24463f21428509276189261b7
 TextureImporter:
   internalIDToNameTable: []
   externalObjects: {}
@@ -14,7 +7,7 @@ TextureImporter:
   mipmaps:
     mipMapMode: 0
     enableMipMap: 1
-    sRGBTexture: 0
+    sRGBTexture: 1
     linearTexture: 0
     fadeOut: 0
     borderMipMap: 0
@@ -61,7 +54,7 @@ TextureImporter:
   alphaUsage: 1
   alphaIsTransparency: 0
   spriteTessellationDetail: -1
-  textureType: 1
+  textureType: 0
   textureShape: 1
   singleChannelComponent: 0
   flipbookRows: 1
@@ -72,7 +65,7 @@ TextureImporter:
   ignorePngGamma: 0
   applyGammaDecoding: 0
   swizzle: 50462976
-  cookieLightType: 1
+  cookieLightType: 0
   platformSettings:
   - serializedVersion: 4
     buildTarget: DefaultTexturePlatform

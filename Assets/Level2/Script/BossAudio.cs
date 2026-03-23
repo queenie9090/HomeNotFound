@@ -46,7 +46,7 @@ public class AudioBoss : MonoBehaviour
             audioSource.clip = clip;
             audioSource.Play();
 
-            yield return new WaitForSeconds(clip.length + Random.Range(2f, 6f));
+            yield return new WaitForSeconds(clip.length + Random.Range(4f, 6f));
         }
     }
 }

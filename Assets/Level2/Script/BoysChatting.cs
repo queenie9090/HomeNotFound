@@ -24,7 +24,7 @@ public class BoysChatting : MonoBehaviour
                 audioSource.clip = clips[i];
                 audioSource.Play();
 
-                yield return new WaitForSeconds(clips[i].length + 1f);
+                yield return new WaitForSeconds(clips[i].length + 4f);
             }
 
         } while (loopSequence);

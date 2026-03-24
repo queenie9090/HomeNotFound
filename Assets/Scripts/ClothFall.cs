@@ -1,22 +1,28 @@
 using UnityEngine;
- // Add this to access XR components
+using UnityEngine.XR.Interaction.Toolkit.Interactables;
 
 public class ClothFall : MonoBehaviour
 {
-    private UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grabScript;
+    private XRGrabInteractable grabScript;
 
     void Start()
     {
-        // Get the grab component and disable it at the start
-        grabScript = GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
-        if (grabScript != null)
+        grabScript = GetComponent<XRGrabInteractable>();
+        if (grabScript != null) grabScript.enabled = false;
+
+        // NEW: Tell Unity physics that NO FORCE is strong enough to break this joint.
+        // Only our script can Destroy it now.
+        FixedJoint joint = GetComponent<FixedJoint>();
+        if (joint != null)
         {
-            grabScript.enabled = false;
+            joint.breakForce = Mathf.Infinity;
+            joint.breakTorque = Mathf.Infinity;
         }
     }
 
     private void OnCollisionEnter(Collision collision)
     {
+        // Now, this is the ONLY way the cloth can ever fall:
         if (collision.gameObject.CompareTag("Stone"))
         {
             FixedJoint joint = GetComponent<FixedJoint>();
@@ -24,12 +30,17 @@ public class ClothFall : MonoBehaviour
             {
                 Destroy(joint);
 
-                // Now that it fell, let the player pick it up!
                 if (grabScript != null)
                 {
                     grabScript.enabled = true;
                 }
+
+                Debug.Log("Hit by Stone! Falling now.");
             }
+        }
+        else
+        {
+            Debug.Log("Hit by " + collision.gameObject.name + ", but it's not a Stone, so I'm staying up!");
         }
     }
 }

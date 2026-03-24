@@ -48,12 +48,12 @@ public class Level2UIManager : MonoBehaviour
                 objectiveText.text = "Find recycle items to sell...";
                 break;
 
-            //case Level2Manager.GameState.EarningRecycle:
-                //objectiveText.text = "Collect junk and sell it.";
-                //break;
+            case Level2Manager.GameState.PriceIncreased:
+                objectiveText.text = "Great! Now I've enough money!";
+                break;
 
             case Level2Manager.GameState.DiscoveredPriceIncreased:
-                objectiveText.text = "The food price has increased!";
+                objectiveText.text = "WHAT?! The food price has increased!";
                 break;
 
             case Level2Manager.GameState.DiscoverBegging:

@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class RecycleTrigger : MonoBehaviour
-{
+{   
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))

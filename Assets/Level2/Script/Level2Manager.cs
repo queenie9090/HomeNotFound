@@ -9,7 +9,7 @@ public class Level2Manager : MonoBehaviour
         EnterLevel,
         NeedMoney,
         DiscoverRecycle,
-        //EarningRecycle,
+        //EarnedRecycle,
         PriceIncreased,
         DiscoveredPriceIncreased,
         DiscoverBegging,
@@ -22,7 +22,7 @@ public class Level2Manager : MonoBehaviour
     public GameState currentState;
 
     public int playerMoney = 0;
-    public int foodPrice = 10;
+    public int foodPrice = 13;
 
     void Awake()
     {
@@ -53,7 +53,7 @@ public class Level2Manager : MonoBehaviour
                 break;
 
             case GameState.PriceIncreased:
-                foodPrice = 20;
+                foodPrice = 25;
                 break;
 
             case GameState.DiscoverBegging:
@@ -77,6 +77,12 @@ public class Level2Manager : MonoBehaviour
     public void AddMoney(int amount)
     {
         playerMoney += amount;
+        CheckProgress();
+    }
+
+    public void DecreaseMoney(int amount)
+    {
+        playerMoney -= amount;
         CheckProgress();
     }
 

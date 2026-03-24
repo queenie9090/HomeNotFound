@@ -13,6 +13,7 @@ public class PriceDisplay : MonoBehaviour
         var state = Level2Manager.Instance.currentState;
 
         if (state == Level2Manager.GameState.PriceIncreased ||
+            state == Level2Manager.GameState.DiscoveredPriceIncreased ||
             state == Level2Manager.GameState.DiscoverBegging ||
             state == Level2Manager.GameState.EarningBegging ||
             state == Level2Manager.GameState.CanBuyFood ||

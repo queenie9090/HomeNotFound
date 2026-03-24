@@ -1,15 +1,22 @@
 using UnityEngine;
-
+using UnityEngine.AI; // Required for NavMesh
+using UnityEngine.XR.Interaction.Toolkit;
 
 public class DogAI_Snatch : MonoBehaviour
 {
-    public GameObject dogObject;   // The Dog NPC (Inactive at start)
-    public Transform mouthPoint;   // Empty object in Dog's mouth
-    public Transform escapePoint;  // Where the dog runs to (City Gate)
+    public GameObject dogObject;
+    public Transform mouthPoint;
+    public Transform escapePoint;
     public Animator dogAnim;
+    public NavMeshAgent agent; // Drag the NavMeshAgent component here
 
     public float runSpeed = 4f;
     public AudioSource barkSource;
+    public AudioSource snatchSource;
+
+    [Header("Custom Dialogue")]
+    [TextArea(3, 10)]
+    public string[] snatchDialogue = { "Hey! My bread!", "Nevermind... he looks hungrier than me." };
 
     private bool isRunningAway = false;
     private GameObject snatchedBread;
@@ -19,93 +26,120 @@ public class DogAI_Snatch : MonoBehaviour
         if (!dogObject.activeSelf)
         {
             dogObject.SetActive(true);
+            Debug.Log("[STATE]: Dog Spawned - Seeking Bread");
 
-            // Trigger the bark exactly when he appears
-            if (barkSource != null)
-            {
-                barkSource.Play();
-            }
+            if (barkSource != null) barkSource.Play();
             if (dogAnim != null) dogAnim.SetBool("IsRunning", true);
-            Debug.Log("Dog appeared and barked!");
+
+            // Set initial speed for NavMesh
+            if (agent != null) agent.speed = runSpeed;
         }
     }
 
     void Update()
     {
-        if (dogObject.activeSelf)
+        if (dogObject.activeSelf && agent != null)
         {
             if (!isRunningAway)
             {
-                // 1. Find the bread in the scene
                 GameObject bread = GameObject.FindWithTag("Bread");
-
                 if (bread != null)
                 {
-                    // 2. Aim for the BREAD position
-                    Vector3 targetPos = bread.transform.position;
-                    targetPos.y = dogObject.transform.position.y; // Keep dog paws on the ground
-
-                    // 3. Move and Look at the Bread
-                    dogObject.transform.position = Vector3.MoveTowards(dogObject.transform.position, targetPos, runSpeed * Time.deltaTime);
-                    dogObject.transform.LookAt(targetPos);
+                    // NavMesh takes care of moving and looking at the target
+                    agent.SetDestination(bread.transform.position);
                 }
             }
             else
             {
-                // Move toward the streets (The Escape Phase)
-                dogObject.transform.position = Vector3.MoveTowards(dogObject.transform.position, escapePoint.position, runSpeed * Time.deltaTime);
-                dogObject.transform.LookAt(escapePoint.position);
+                // Seeking the escape point
+                agent.SetDestination(escapePoint.position);
 
-                // --- NEW: Check if we reached the end ---
-                float distToGate = Vector3.Distance(dogObject.transform.position, escapePoint.position);
-
-                if (distToGate < 0.2f)
+                // Check if reached destination using Agent logic
+                if (!agent.pathPending && agent.remainingDistance < 0.2f)
                 {
-                    // Option A: Just turn the dog off
-                    dogObject.SetActive(false);
-
-                    // Option B: If you want the bread to disappear too
-                    if (snatchedBread != null) snatchedBread.SetActive(false);
-
-                    if (Vector3.Distance(dogObject.transform.position, escapePoint.position) < 0.2f)
+                    if (agent.speed > 0)
                     {
+                        Debug.Log("[STATE]: Dog reached Gate - Vanishing soon");
+                        agent.speed = 0; // Stop the agent
                         if (dogAnim != null) dogAnim.SetBool("IsRunning", false);
-                        Invoke("TurnOffDog", 1.5f); // Wait a bit so we see the idle/sit
+                        Invoke("TurnOffDog", 0.5f);
                     }
-                    Debug.Log("Dog reached the city and vanished.");
                 }
             }
         }
     }
 
-    // 2. The physical snatch happens when the Dog touches the Bread
+    void TurnOffDog()
+    {
+        dogObject.SetActive(false);
+        if (snatchedBread != null) snatchedBread.SetActive(false);
+        Debug.Log("[STATE]: Dog Inactive - Left Alley");
+    }
+
     private void OnTriggerEnter(Collider other)
     {
+        // ONLY do this if it's the bread and the dog hasn't already snatched it
         if (other.CompareTag("Bread") && !isRunningAway)
         {
+            Debug.Log("[STATE]: Bread Snatched - Triggering Feedback");
+
             snatchedBread = other.gameObject;
             isRunningAway = true;
 
-            // Force player to drop bread
-            UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable grab = snatchedBread.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
-            if (grab != null) grab.enabled = false;
+            // 1. PLAY THE SNATCH SOUND
+            if (snatchSource != null)
+            {
+                snatchSource.Play();
+                Debug.Log("[AUDIO]: Playing Crunch Sound at " + snatchSource.volume + " volume.");
+            }
+            else
+            {
+                Debug.LogError("[AUDIO]: SnatchSource is MISSING in the Inspector!");
+            }
 
-            // 1. STOP THE SNAG: Disable the bread's collider immediately
-            // This prevents the bread from "hooking" the trash bin as the dog runs
+            // 2. TRIGGER HAPTICS (Vibration)
+            // We get the grab component to find which hand is holding it
+            var interactable = snatchedBread.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+            if (interactable != null && interactable.isSelected)
+            {
+                // This sends the vibration to the specific controller holding the bread
+                interactable.interactorsSelecting[0].transform.GetComponent<ActionBasedController>().SendHapticImpulse(0.7f, 0.2f);
+                Debug.Log("[FEEDBACK]: Haptic Impulse Sent to Player");
+            }
+
+            // 3. LOGIC: Disable grab and physics
+            if (interactable != null) interactable.enabled = false;
+
             Collider breadCollider = other.GetComponent<Collider>();
             if (breadCollider != null) breadCollider.enabled = false;
 
-            // 2. STOP THE PHYSICS: Make it Kinematic so it doesn't fall or bounce
             Rigidbody breadRb = other.GetComponent<Rigidbody>();
             if (breadRb != null) breadRb.isKinematic = true;
 
-            // Chomp! Attach bread to mouth
-            snatchedBread.transform.SetParent(mouthPoint);
-            snatchedBread.transform.localPosition = Vector3.zero;
-            snatchedBread.GetComponent<Rigidbody>().isKinematic = true;
 
-            isRunningAway = true; // Change direction to the City Gate
-            Debug.Log("Dog snatched and is running away!");
+            // 3. Play the Sequence
+            if (DialogueManager.Instance != null)
+                DialogueManager.Instance.ShowDialogueSequence(snatchDialogue);
+
+            if (JournalManager.Instance != null)
+            {
+                JournalManager.Instance.CompleteTask(1); // Mark in the book
+            }
+
+            if (MissionManager.Instance != null)
+            {
+                MissionManager.Instance.MarkDogComplete(); // Update the level exit logic
+            }
+
+            // 4. ATTACH TO MOUTH
+            snatchedBread.transform.SetParent(mouthPoint);
+            foreach (Transform child in snatchedBread.transform)
+            {
+                child.SetParent(null);
+            }
+            snatchedBread.transform.localPosition = Vector3.zero;
+
+            Debug.Log("[STATE]: Running to Escape Point");
         }
     }
 }

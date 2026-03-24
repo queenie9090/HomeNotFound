@@ -6,6 +6,7 @@ TagManager:
   tags:
   - Stone
   - Bread
+  - RecycleItem
   layers:
   - Default
   - TransparentFX
@@ -15,7 +16,7 @@ TagManager:
   - UI
   - Floor
   - NPC
-  - 
+  - DialogueLayer
   - 
   - 
   - 

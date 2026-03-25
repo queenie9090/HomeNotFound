@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.AI; // Required for NavMesh
 using UnityEngine.XR.Interaction.Toolkit;
+using System.Collections;
 
 public class DogAI_Snatch : MonoBehaviour
 {
@@ -119,7 +120,7 @@ public class DogAI_Snatch : MonoBehaviour
 
             // 3. Play the Sequence
             if (DialogueManager.Instance != null)
-                DialogueManager.Instance.ShowDialogueSequence(snatchDialogue);
+                StartCoroutine(PlaySnatchSequence());
 
             if (JournalManager.Instance != null)
             {
@@ -142,4 +143,16 @@ public class DogAI_Snatch : MonoBehaviour
             Debug.Log("[STATE]: Running to Escape Point");
         }
     }
+
+    IEnumerator PlaySnatchSequence()
+    {
+        // Line 1: Immediate reaction
+        DialogueManager.Instance.ShowDialogue("Hey! My bread!");
+        yield return new WaitForSeconds(2.5f); // Adjust this to make it faster/slower
+
+        // Line 2: The realization
+        DialogueManager.Instance.ShowDialogue("Nevermind... he looks hungrier than me.");
+        yield return new WaitForSeconds(3.5f);
+    }
+
 }

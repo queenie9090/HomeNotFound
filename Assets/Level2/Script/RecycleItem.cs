@@ -1,7 +1,7 @@
 using UnityEngine;
 
 public class RecycleItem : MonoBehaviour
-{   //only for the recycle items to keep it's value
+{ 
     public int value = 2;
 
     /*

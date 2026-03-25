@@ -23,7 +23,7 @@ public class LightFlicker : MonoBehaviour
             lightSource.intensity = Random.Range(minIntensity, maxIntensity);
 
             // Wait for a short, random burst of time
-            yield return new WaitForSeconds(Random.Range(1.0f, 10.0f));
+            yield return new WaitForSeconds(Random.Range(1.0f, 2.0f));
         }
     }
 }

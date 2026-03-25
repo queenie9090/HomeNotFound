@@ -44,7 +44,7 @@ public class MissionManager : MonoBehaviour
         // the moment BOTH tasks are finished.
         if (clothDone && dogDone)
         {
-            Invoke("PlayFinalSequence", 4.0f);
+            Invoke("PlayFinalSequence", 6.0f);
         }
     }
 

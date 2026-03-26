@@ -1,0 +1,31 @@
+using UnityEngine;
+using UnityEngine.XR.Interaction.Toolkit;
+
+public class StealMoney : MonoBehaviour
+{
+    public Level2Manager manager;
+    public StoleDetector stole;
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip takeSound;
+
+    void Update()
+    {
+
+    }
+
+    // Called by XR Interaction
+    public void OnRaySelect()
+    {
+
+        if (audioSource != null && takeSound != null)
+            audioSource.PlayOneShot(takeSound);
+
+        stole.setActiveStole();
+
+        manager.AddMoney(6);
+
+        Destroy(gameObject);
+    }
+}

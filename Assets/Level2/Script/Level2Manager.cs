@@ -55,7 +55,7 @@ public class Level2Manager : MonoBehaviour
                 break;
 
             case GameState.PriceIncreased:
-                foodPrice = 25;
+
                 break;
 
             case GameState.DiscoverBegging:
@@ -94,10 +94,16 @@ public class Level2Manager : MonoBehaviour
         {
             if (currentState == GameState.DiscoverRecycle)
             {
+                DialogueManager.Instance.ShowDialogue("Finally, my have enough money to buy food.");
+                foodPrice = 25;
+                Debug.Log("Dialog should display");
                 SetState(GameState.PriceIncreased);
+
             }
             else if (currentState == GameState.EarningBegging)
             {
+                DialogueManager.Instance.ShowDialogue("Finally! I have enough money! Lets go check out that Mamak again!");
+                Debug.Log("Dialog should display");
                 SetState(GameState.CanBuyFood);
             }
         }

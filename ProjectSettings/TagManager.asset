@@ -7,6 +7,7 @@ TagManager:
   - Stone
   - Bread
   - RecycleItem
+  - Bone
   layers:
   - Default
   - TransparentFX

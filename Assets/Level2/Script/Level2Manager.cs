@@ -21,6 +21,8 @@ public class Level2Manager : MonoBehaviour
 
     public GameState currentState;
 
+    //private RecycleItem[] recycleItems;
+
     public int playerMoney = 0;
     public int foodPrice = 13;
 
@@ -49,7 +51,7 @@ public class Level2Manager : MonoBehaviour
                 break;
 
             case GameState.DiscoverRecycle:
-                // Highlight recycle shop
+
                 break;
 
             case GameState.PriceIncreased:

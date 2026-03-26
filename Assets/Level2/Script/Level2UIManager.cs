@@ -65,7 +65,7 @@ public class Level2UIManager : MonoBehaviour
                 break;
 
             case Level2Manager.GameState.CanBuyFood:
-                objectiveText.text = "You can now buy food!";
+                objectiveText.text = "I can now buy food!";
                 break;
 
             case Level2Manager.GameState.BoughtFood:

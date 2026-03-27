@@ -7,6 +7,8 @@ public class StoleDetector : MonoBehaviour
     public GameObject bagger1;
     public GameObject bagger2;
 
+    public BaggerTrigger stoleDialogue;
+
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip deadSound;
@@ -15,6 +17,7 @@ public class StoleDetector : MonoBehaviour
     void Start()
     {
         gameObject.SetActive(false);
+        bagger2.SetActive(false);
     }
 
     public void setActiveStole()
@@ -27,6 +30,8 @@ public class StoleDetector : MonoBehaviour
         if(audioSource != null && deadSound != null)
             audioSource.PlayOneShot(deadSound);
 
+        stoleDialogue.moneyStole = true;
+
         DialogueManager.Instance.ShowDialogue("What's that sound?! Better go check on the guy just now!");
 
         if(bagger1 != null && bagger2 != null)
@@ -34,5 +39,7 @@ public class StoleDetector : MonoBehaviour
             bagger1.SetActive(false);
             bagger2.SetActive(true);
         }
+
+        Destroy(gameObject);
     }
 }

@@ -10,9 +10,12 @@ public class BegTrigger : MonoBehaviour
         {
             var gm = Level2Manager.Instance;
             if (gm.currentState == Level2Manager.GameState.DiscoveredPriceIncreased)
-                npc.SetCanBeg(true);
-            else
-                return;
+            { 
+            DialogueManager.Instance.ShowDialogue("I need to earn some money... Maybe I can beg for some change?");
+            npc.SetCanBeg(true);
+        }
+        else
+            return;
         }
     }
 

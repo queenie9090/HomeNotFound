@@ -1,0 +1,38 @@
+using UnityEngine;
+
+public class StoleDetector : MonoBehaviour
+{
+
+    [Header("Bagger")]
+    public GameObject bagger1;
+    public GameObject bagger2;
+
+    [Header("Audio")]
+    public AudioSource audioSource;
+    public AudioClip deadSound;
+
+    // Start is called once before the first execution of Update after the MonoBehaviour is created
+    void Start()
+    {
+        gameObject.SetActive(false);
+    }
+
+    public void setActiveStole()
+    {
+        gameObject.SetActive(true);
+    }
+
+    void OnTriggerEnter(Collider other)
+    {
+        if(audioSource != null && deadSound != null)
+            audioSource.PlayOneShot(deadSound);
+
+        DialogueManager.Instance.ShowDialogue("What's that sound?! Better go check on the guy just now!");
+
+        if(bagger1 != null && bagger2 != null)
+        {
+            bagger1.SetActive(false);
+            bagger2.SetActive(true);
+        }
+    }
+}

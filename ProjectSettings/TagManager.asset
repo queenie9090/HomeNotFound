@@ -18,9 +18,9 @@ TagManager:
   - Floor
   - NPC
   - DialogueLayer
-  - 
-  - 
-  - 
+  - Player
+  - Environment
+  - Dog
   - 
   - 
   - 

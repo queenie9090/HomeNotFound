@@ -20,16 +20,24 @@ public class BaggerSwing : MonoBehaviour
     {
         float timer = 0f;
 
+        Vector3 originalPos = rbLegL.transform.localPosition;
+
         while (timer < struggleDuration)
         {
-            rbHead.AddForce(Vector3.forward * 2f, ForceMode.Impulse);
-            rbHandL.AddForce(Vector3.forward * 2f, ForceMode.Impulse);
-            rbHandR.AddForce(Vector3.forward * 2f, ForceMode.Impulse);
-            rbLegL.AddForce(Vector3.forward * 2f, ForceMode.Impulse);
-            rbHead.AddForce(Vector3.forward * 2f, ForceMode.Impulse);
+            // move slightly left
+            rbLegL.transform.localPosition = originalPos + new Vector3(-0.05f, 0, 0);
+            rbLegR.transform.localPosition = originalPos + new Vector3(-0.05f, 0, 0);
+            rbHandL.transform.localPosition = originalPos + new Vector3(-0.05f, 0, 0);
+            rbHandR.transform.localPosition = originalPos + new Vector3(-0.05f, 0, 0);
 
-            timer += Time.deltaTime;
+            yield return new WaitForSeconds(0.2f);
+
+            // move back
+            rbLegL.transform.localPosition = originalPos;
+
+            yield return new WaitForSeconds(0.2f);
+
+            timer += 0.4f;
         }
-        yield return new WaitForSeconds(1.5f);
     }
 }

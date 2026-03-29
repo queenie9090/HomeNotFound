@@ -3,11 +3,17 @@ using System.Collections;
 
 public class BaggerTrigger : MonoBehaviour
 {
+
+    public bool moneyStole = false;
+
     private void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            StartCoroutine(DialogueSequence());
+            if (moneyStole)
+                StartCoroutine(StoleDialogueSequence());
+            else
+                StartCoroutine(DialogueSequence());
         }
     }
 
@@ -26,5 +32,14 @@ public class BaggerTrigger : MonoBehaviour
         yield return new WaitForSeconds(4.5f);
 
         DialogueManager.Instance.ShowDialogue("What am I even thinking about...");
+    }
+
+    IEnumerator StoleDialogueSequence()
+    {
+        DialogueManager.Instance.ShowDialogue("... ...");
+
+        yield return new WaitForSeconds(2.5f);
+
+        Destroy(gameObject);
     }
 }

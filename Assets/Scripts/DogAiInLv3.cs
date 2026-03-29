@@ -1,98 +1,133 @@
 ﻿using UnityEngine;
-using UnityEngine.AI;
+
 public class DogAiInLv3 : MonoBehaviour
 {
-    public NavMeshAgent agent;
+    [Header("References")]
     public Transform player;
     public Transform playerHand;
-    public Transform npc; 
-    private Patrol npcScript;
+    public Transform npc;
+    private NpcBoneDetector npcDetector;
+    private GameObject cachedBone;
 
-    public float wanderRadius = 10f;
-    public float wanderTimer = 5f;
+    [Header("Movement")]
+    public float moveSpeed = 5f;
+    public float rotationSpeed = 8f;
+    public float stopDistance = 1.5f;
+    public LayerMask obstacleMask; // <--- ADD THIS LINE HERE
 
-    private float timer;
-
-    public float sightRange = 15f;
+    [Header("Wander")]
+    public float wanderRadius = 5f;
+    private Vector3 wanderTarget;
+    private float wanderTimer;
 
     void Start()
     {
-        timer = wanderTimer;
-
-        npcScript = npc.GetComponent<Patrol>();
+        cachedBone = GameObject.FindGameObjectWithTag("Bone");
+        if (npc != null) npcDetector = npc.GetComponent<NpcBoneDetector>();
+        PickNewWanderTarget();
     }
 
     void Update()
     {
-        bool canSeePlayer = HasLineOfSight();
-        bool holdingBone = IsHoldingBone();
+        bool blocked = IsPathBlocked();
 
-        // Chase NPC if it is running
-        if (npcScript != null && npcScript.isRunning)
+        if (blocked)
         {
-            agent.SetDestination(npc.position);
-            agent.speed = 6f;
+            // SPIN if hitting wall or edge
+            transform.Rotate(Vector3.up * rotationSpeed * 15f * Time.deltaTime);
         }
-        // Chase player if holding bone + visible
-        else if (holdingBone && canSeePlayer)
-        {
-            agent.SetDestination(player.position);
-            agent.speed = 5f;
-        }
-        // DEFAULT: Wander
         else
         {
-            Wander();
+            // LOGIC
+            if (npcDetector != null && npcDetector.isTargetedByDog)
+            {
+                PursueTarget(npc.position);
+            }
+            else if (IsHoldingBone())
+            {
+                PursueTarget(player.position);
+            }
+            else
+            {
+                Wander();
+            }
         }
     }
 
-    //LOS check
-    bool HasLineOfSight()
+    // Updated Block Check
+    bool IsPathBlocked()
     {
-        RaycastHit hit;
-        Vector3 direction = (player.position - transform.position).normalized;
+        // Offset the start so it doesn't hit the dog's own model
+        Vector3 forwardOffset = transform.forward * 0.6f;
+        Vector3 rayOrigin = transform.position + Vector3.up + forwardOffset;
 
-        if (Physics.Raycast(transform.position, direction, out hit, sightRange))
-        {
-            if (hit.transform == player)
-                return true;
-        }
+        // Wall Check
+        if (Physics.Raycast(rayOrigin, transform.forward, 1.0f, obstacleMask)) return true;
+
+        // Edge Check
+        Vector3 edgePos = transform.position + (transform.forward * 1.5f) + Vector3.up;
+        if (!Physics.Raycast(edgePos, Vector3.down, 2.5f, obstacleMask)) return true;
+
         return false;
     }
 
-    //Check if holding bone
+    void PursueTarget(Vector3 targetPos)
+    {
+        float distance = Vector3.Distance(transform.position, targetPos);
+
+        // Rotate to face target
+        Vector3 dir = (targetPos - transform.position).normalized;
+        dir.y = 0;
+        if (dir != Vector3.zero)
+        {
+            Quaternion lookRot = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, Time.deltaTime * rotationSpeed);
+        }
+
+        // Move forward
+        if (distance > stopDistance)
+        {
+            transform.Translate(Vector3.forward * moveSpeed * Time.deltaTime);
+        }
+    }
+
     bool IsHoldingBone()
     {
-        if (playerHand.childCount > 0)
+        if (cachedBone == null)
         {
-            Transform heldObj = playerHand.GetChild(0);
-            return heldObj.CompareTag("Bone");
+            cachedBone = GameObject.FindGameObjectWithTag("Bone");
+            return false;
         }
-        return false;
+        return Vector3.Distance(playerHand.position, cachedBone.transform.position) < 0.6f;
     }
 
     void Wander()
     {
-        timer += Time.deltaTime;
+        wanderTimer += Time.deltaTime;
 
-        if (timer >= wanderTimer)
+        // Move forward at half speed while wandering
+        transform.Translate(Vector3.forward * (moveSpeed * 0.5f) * Time.deltaTime);
+
+        // Look towards the wander target
+        Vector3 dir = (wanderTarget - transform.position).normalized;
+        dir.y = 0;
+        if (dir != Vector3.zero)
         {
-            Vector3 newPos = RandomNavSphere(transform.position, wanderRadius);
-            agent.SetDestination(newPos);
-            agent.speed = 2f;
-            timer = 0;
+            Quaternion lookRot = Quaternion.LookRotation(dir);
+            transform.rotation = Quaternion.Slerp(transform.rotation, lookRot, Time.deltaTime * rotationSpeed);
+        }
+
+        // Pick a new target if we reached the old one or time ran out
+        if (wanderTimer > 4f || Vector3.Distance(transform.position, wanderTarget) < 1.5f)
+        {
+            PickNewWanderTarget();
         }
     }
 
-    // random point
-    public static Vector3 RandomNavSphere(Vector3 origin, float dist)
+    void PickNewWanderTarget()
     {
-        Vector3 randDirection = Random.insideUnitSphere * dist;
-        randDirection += origin;
-
-        NavMeshHit navHit;
-        NavMesh.SamplePosition(randDirection, out navHit, dist, -1);
-
-        return navHit.position;
+        wanderTarget = transform.position + (Random.insideUnitSphere * wanderRadius);
+        wanderTarget.y = transform.position.y;
+        wanderTimer = 0;
     }
 }

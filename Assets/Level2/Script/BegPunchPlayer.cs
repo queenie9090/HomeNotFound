@@ -5,61 +5,33 @@ public class BegPunchPlayer : MonoBehaviour
 {
     public Level2Manager manager;
 
-    [Header("Player")]
-    public Transform player;
-    public float activationDistance = 2.0f;
-
-    [Header("Flee Settings")]
-    public float fleeSpeed = 5f;
-    public float safeDistance = 10f;
-    public float stopDistance = 15f;
-    private bool isFleeing = false;
-
-    [Header("Audio")]
-    public AudioClip giveClip;
-    public AudioClip rejectClip;
-    public AudioClip screamClip;
-
-    [Header("Hand References")]
+    [Header("Player References")]
+    public Transform playerHead;
     public Transform leftHand;
     public Transform rightHand;
 
-    [Header("Interaction Settings")]
-    public float interactDistance = 1.5f;
-    public float punchVelocityThreshold = 2.5f;
-    public float begVelocityThreshold = 1.0f;
-
-    [Header("Direction Check")]
-    public float punchDotThreshold = 0.5f;
-
-    [Header("Cooldown")]
-    public float actionCooldown = 1.5f;
+    [Header("Settings")]
+    public float begDistance = 3.0f;
+    public float handsTogetherThreshold = 0.4f;
+    public float actionCooldown = 2.0f;
     private float lastActionTime = 0f;
 
-    [Header("Money")]
-    public int minMoney = 1;
-    public int maxMoney = 5;
+    [Header("Fleeing")]
+    public float fleeSpeed = 5f;
+    public float stopDistance = 15f;
+    private bool isFleeing = false;
+    private bool isScared = false;
 
     [Header("Components")]
     public Animator animator;
     public AudioSource audioSource;
+    public AudioClip giveClip;
+    public AudioClip rejectClip;
+    public AudioClip screamClip;
 
-    [Header("Optional Haptics")]
-    public XRBaseController leftController;
-    public XRBaseController rightController;
-
-    private Vector3 lastLeftPos;
-    private Vector3 lastRightPos;
-
-    private bool isScared = false;
+    [Header("State Tracking")]
     public bool canBeg = false;
-    private bool hasTriggeredBegging = false;
-
-    void Start()
-    {
-        if (leftHand != null) lastLeftPos = leftHand.position;
-        if (rightHand != null) lastRightPos = rightHand.position;
-    }
+    private bool hasBeggedThisTime = false; // The "One-Shot" Latch
 
     void Update()
     {
@@ -69,122 +41,114 @@ public class BegPunchPlayer : MonoBehaviour
             return;
         }
 
-        if (!canBeg) return;
         if (isScared) return;
 
-        DetectHand(leftHand, ref lastLeftPos, leftController);
-        DetectHand(rightHand, ref lastRightPos, rightController);
+        if (canBeg)
+        {
+            CheckForBegging();
+        }
+    }
+
+    // 1. ADDED THE MISSING FUNCTION
+    bool CanAct()
+    {
+        return Time.time > lastActionTime + actionCooldown;
+    }
+
+    void CheckForBegging()
+    {
+        if (leftHand == null || rightHand == null || playerHead == null) return;
+
+        Vector3 npcPos = transform.position;
+        Vector3 playerPos = playerHead.position;
+        npcPos.y = 0; playerPos.y = 0;
+
+        float distToNPC = Vector3.Distance(playerPos, npcPos);
+        float handDist = Vector3.Distance(leftHand.position, rightHand.position);
+
+        // Logic check
+        bool isInRange = distToNPC < begDistance;
+        bool isHandsTogether = handDist < handsTogetherThreshold;
+        bool readyToAct = Time.time > lastActionTime + actionCooldown;
+
+        // 1. TRIGGER: If in range AND hands together AND not locked
+        if (isInRange && isHandsTogether)
+        {
+            if (!hasBeggedThisTime && readyToAct)
+            {
+                ExecuteBeggingLogic();
+                hasBeggedThisTime = true; // Lock it!
+                Debug.Log("<color=cyan>Begging Locked.</color>");
+            }
+        }
+        // 2. UNLOCK: If the player moves hands apart OR walks out of range
+        else if (!isHandsTogether || !isInRange)
+        {
+            if (hasBeggedThisTime)
+            {
+                hasBeggedThisTime = false;
+                Debug.Log("<color=white>Begging Unlocked.</color> (Hands separated or stepped back)");
+            }
+        }
+    }
+
+    public void OnPunch(XRBaseController controller)
+    {
+        if (isScared) return;
+
+        lastActionTime = Time.time;
+        isScared = true;
+        isFleeing = true;
+
+        if (audioSource && screamClip) audioSource.PlayOneShot(screamClip);
+        if (animator) animator.SetTrigger("RunAway");
+
+        Debug.Log("<color=red>NPC Punched!</color>");
+    }
+
+    void ExecuteBeggingLogic()
+    {
+        lastActionTime = Time.time;
+        int chance = Random.Range(0, 100);
+
+        Debug.Log("<color=green>Begging Triggered!</color> Roll: " + chance);
+
+        if (chance < 60)
+        {
+            Level2Manager.Instance.AddMoney(Random.Range(1, 6));
+            if (animator) animator.SetTrigger("Give");
+            if (audioSource) audioSource.PlayOneShot(giveClip);
+        }
+        else
+        {
+            if (animator) animator.SetTrigger("Reject");
+            if (audioSource) audioSource.PlayOneShot(rejectClip);
+        }
+    }
+
+    void FleeFromPlayer()
+    {
+        Vector3 directionAway = (transform.position - playerHead.position).normalized;
+        directionAway.y = 0;
+        transform.position += directionAway * fleeSpeed * Time.deltaTime;
+        transform.forward = directionAway;
+
+        if (Vector3.Distance(transform.position, playerHead.position) > stopDistance)
+        {
+            isFleeing = false;
+        }
     }
 
     public void SetCanBeg(bool value)
     {
         canBeg = value;
 
-        if (canBeg && !hasTriggeredBegging)
+        // NEW: If the player leaves the NPC's area, 
+        // we MUST reset the lock so they can beg again when they return.
+        if (canBeg == false)
         {
-            manager.SetState(Level2Manager.GameState.DiscoverBegging);
-            hasTriggeredBegging = true;
-        }
-    }
-
-    void DetectHand(Transform hand, ref Vector3 lastPos, XRBaseController controller)
-    {
-        if (hand == null) return;
-
-        float distance = Vector3.Distance(hand.position, transform.position);
-
-        // Calculate velocity
-        float velocity = (hand.position - lastPos).magnitude / Time.deltaTime;
-
-        // Direction check (is hand moving toward NPC)
-        Vector3 toNPC = (transform.position - hand.position).normalized;
-        Vector3 handDir = (hand.position - lastPos).normalized;
-        float dot = Vector3.Dot(handDir, toNPC);
-
-        if (distance < interactDistance && CanAct())
-        {
-            if (velocity > punchVelocityThreshold && dot > punchDotThreshold)
-            {
-                OnPunch(controller);
-            }
-            else if (velocity > 0.1f && velocity < begVelocityThreshold)
-            {
-                OnBeg(controller);
-            }
-        }
-
-        lastPos = hand.position;
-    }
-
-    bool CanAct()
-    {
-        return Time.time > lastActionTime + actionCooldown;
-    }
-
-    void OnBeg(XRBaseController controller)
-    {
-        lastActionTime = Time.time;
-
-        int chance = Random.Range(0, 100);
-
-        if (chance < 60)
-        {
-            int money = Random.Range(minMoney, maxMoney + 1);
-            Level2Manager.Instance.AddMoney(money);
-
-            animator.SetTrigger("Give");
-            audioSource.PlayOneShot(giveClip);
-
-            SendHaptics(controller, 0.3f, 0.2f);
-        }
-        else
-        {
-            animator.SetTrigger("Reject");
-            audioSource.PlayOneShot(rejectClip);
-        }
-    }
-
-    void FleeFromPlayer()
-    {
-        if (player == null) return;
-
-        Vector3 directionAway = (transform.position - player.position).normalized;
-
-        // Move away
-        transform.position += directionAway * fleeSpeed * Time.deltaTime;
-
-        // Face movement direction
-        transform.forward = directionAway;
-
-        float distance = Vector3.Distance(transform.position, player.position);
-
-        // Stop when far enough
-        if (distance > stopDistance)
-        {
-            isFleeing = false;
-        }
-    }
-
-    void OnPunch(XRBaseController controller)
-    {
-        lastActionTime = Time.time;
-
-        animator.SetTrigger("RunAway");
-
-        SendHaptics(controller, 0.8f, 0.3f);
-
-        isScared = true;
-        isFleeing = true;
-
-        // Optional: disable interaction
-        GetComponent<Collider>().enabled = false;
-    }
-
-    void SendHaptics(XRBaseController controller, float amplitude, float duration)
-    {
-        if (controller != null)
-        {
-            controller.SendHapticImpulse(amplitude, duration);
+            hasBeggedThisTime = false;
+            Debug.Log("<color=white>Player left. Begging state fully reset.</color>");
         }
     }
 }

@@ -4,44 +4,25 @@ using System.Collections;
 
 public class Level2Dialogue : MonoBehaviour
 {
-    public TextMeshProUGUI dialogueText; // Drag your screen text here
-    public static Level2Dialogue Instance;
-
-
-    void Awake() => Instance = this;
-
-    public void EnoughMoneyDialogue()
+    void Start()
     {
-        StopAllCoroutines();
-        StartCoroutine(ShowDialogue("Finally, my have enough money to buy food, lets head back to the food stall."));
+        StartCoroutine(ExecuteIntro());
     }
 
-    public void DiscoveredPriceIncreasedDialogue()
+    IEnumerator ExecuteIntro()
     {
-        StopAllCoroutines();
-        StartCoroutine(ShowDialogue("WHAT?! The food price has increased? Due to increased cost... of course..."));
-    }
+        // 1. Start in the dark
+        yield return new WaitForSeconds(1.0f);
+        DialogueManager.Instance.ShowDialogue("Street full of people...");
 
-    public void DiscoveredBeggingDialogue()
-    {
-        StopAllCoroutines();
-        StartCoroutine(ShowDialogue("Maybe I can try to beg..."));
-    }
+        // 2. Wait for the fade to reveal the room
+        yield return new WaitForSeconds(5.5f);
+        DialogueManager.Instance.ShowDialogue("Great, just what I need right now...");
 
-    public void FinallyEnoughMoneyDialogue()
-    {
-        StopAllCoroutines();
-        StartCoroutine(ShowDialogue("Finally! I have enough money! Lets go check out that Mamak again!"));
-    }
+        // 3. The final "Mission" statement
+        yield return new WaitForSeconds(5.8f);
+        DialogueManager.Instance.ShowDialogue("Find some food to eat first, I'm starving...");
 
-    IEnumerator ShowDialogue(string message)
-    {
-        dialogueText.text = message;
-        dialogueText.color = Color.yellow; // Make new thoughts stand out
-
-        yield return new WaitForSeconds(5f); // Show for 5 seconds
-
-        dialogueText.color = Color.white;
-        dialogueText.text = "... (Back to survival)";
+        // At this point, the player is fully "in" the game and looking for the Journal.
     }
 }

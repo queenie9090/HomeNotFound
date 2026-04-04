@@ -4,7 +4,10 @@ using System.Collections;
 public class AudioBoss : MonoBehaviour
 {
     public AudioSource audioSource;
-    public AudioClip[] clips;
+
+    [Header("Dialogue Sets")]
+    public AudioClip[] normalClips;
+    public AudioClip[] cursingClips;
 
     private bool playerNearby = false;
     private Coroutine playRoutine;
@@ -40,10 +43,20 @@ public class AudioBoss : MonoBehaviour
     {
         while (playerNearby)
         {
-            if (clips.Length == 0) yield break;
+            AudioClip[] clipsToUse;
 
-            AudioClip clip = clips[Random.Range(0, clips.Length)];
+            if (CursingControl.Instance != null && CursingControl.Instance.allowCursing)
+                clipsToUse = cursingClips;
+            else
+                clipsToUse = normalClips;
+
+            if (clipsToUse == null || clipsToUse.Length == 0)
+                yield break;
+
+            AudioClip clip = clipsToUse[Random.Range(0, clipsToUse.Length)];
+
             audioSource.clip = clip;
+            audioSource.volume = 1.0f;
             audioSource.Play();
 
             yield return new WaitForSeconds(clip.length + Random.Range(4f, 6f));

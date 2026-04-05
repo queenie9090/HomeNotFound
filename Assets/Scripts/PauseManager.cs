@@ -2,6 +2,7 @@ using UnityEngine;
 using UnityEngine.SceneManagement;
 using TMPro;
 using UnityEngine.UI;
+using UnityEngine.InputSystem; // Add this!
 
 public class PauseManager : MonoBehaviour
 {
@@ -25,6 +26,17 @@ public class PauseManager : MonoBehaviour
 
     private bool isPaused = false;
     private bool _isReady = false;
+
+    public InputActionProperty menuButtonAction; // Drag "Menu" or "X" action here
+
+    void Update()
+    {
+        // Check if the button was pressed THIS frame
+        if (menuButtonAction.action.WasPressedThisFrame())
+        {
+            TogglePause();
+        }
+    }
 
     System.Collections.IEnumerator EnableAudioAfterDelay()
     {
@@ -68,27 +80,25 @@ public class PauseManager : MonoBehaviour
         pauseMenuPanel.SetActive(true);
         PlayerPrefs.Save();
         Debug.Log("<color=green>[PauseManager]</color> Settings Saved to Disk.");
+  
     }
 
     public void TogglePause()
     {
         isPaused = !isPaused;
 
-        if (!isPaused)
+        // Ensure the panel exists before toggling
+        if (pauseMenuPanel != null)
         {
-            pauseMenuPanel.SetActive(false);
-            settingsPanel.SetActive(false);
-        }
-        else
-        {
-            pauseMenuPanel.SetActive(true);
+            pauseMenuPanel.SetActive(isPaused);
         }
 
         Time.timeScale = isPaused ? 0f : 1f;
-        Debug.Log("<color=yellow>[PauseManager]</color> Pause Toggled. IsPaused: " + isPaused);
+        Debug.Log("<color=yellow>[PauseManager]</color> Button Pressed. Paused: " + isPaused);
     }
 
-    public void ResetLevel()
+
+public void ResetLevel()
     {
         Time.timeScale = 1f;
         Debug.Log("<color=orange>[PauseManager]</color> Resetting Level...");

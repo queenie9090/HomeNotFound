@@ -4,23 +4,29 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class NpcHitbox : MonoBehaviour
 {
     public BegPunchPlayer mainScript;
-    public float punchVelocityThreshold = 2.0f;
+    public float punchVelocityThreshold = 1.5f;
 
     private void OnTriggerEnter(Collider other)
     {
-        // Check if the thing hitting the head is a hand
-        // Make sure your VR Hands have a Tag "Player" or "Hand"
         if (other.CompareTag("Hand") || other.CompareTag("Player"))
         {
-            // Get the velocity of the hand
-            // If the hand has a Rigidbody, we use that. Otherwise, we can 
-            // use a simple velocity check from a script on the hand.
-            Rigidbody rb = other.GetComponent<Rigidbody>();
-            float speed = (rb != null) ? rb.linearVelocity.magnitude : 3.0f; // Default to 3 if no RB
+            // which hand hit us, checking distance
+            float distToLeft = Vector3.Distance(transform.position, mainScript.leftHand.position);
+            float distToRight = Vector3.Distance(transform.position, mainScript.rightHand.position);
 
-            if (speed > punchVelocityThreshold)
+            // speed from the main script
+            float impactSpeed = (distToLeft < distToRight) ? mainScript.currentLeftSpeed : mainScript.currentRightSpeed;
+
+            Debug.Log($"<color=orange>Punch Detected!</color> Speed: {impactSpeed:F2} | Needed: {punchVelocityThreshold}");
+
+            // Trigger the punch if it's fast enough
+            if (impactSpeed > punchVelocityThreshold)
             {
-                mainScript.OnPunch(null); // Trigger the flee logic
+                ActionBasedController controller = other.GetComponentInParent<ActionBasedController>();
+                if (mainScript != null)
+                {
+                    mainScript.OnPunch(controller);
+                }
             }
         }
     }

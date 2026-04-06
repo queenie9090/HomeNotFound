@@ -16,28 +16,55 @@ public class BegPunchPlayer : MonoBehaviour
     public float actionCooldown = 2.0f;
     private float lastActionTime = 0f;
 
-    [Header("Fleeing")]
+    [Header("Fleeing Settings")]
+    public Transform fleePoint; 
     public float fleeSpeed = 5f;
     public float stopDistance = 15f;
     private bool isFleeing = false;
     private bool isScared = false;
 
-    [Header("Components")]
+    [Header("Components & Scripts")]
     public Animator animator;
     public AudioSource audioSource;
+    public MonoBehaviour boysChattingScript;
+
+    [Header("Audio Clips")]
     public AudioClip giveClip;
     public AudioClip rejectClip;
     public AudioClip screamClip;
 
     [Header("State Tracking")]
     public bool canBeg = false;
-    private bool hasBeggedThisTime = false; // The "One-Shot" Latch
+    private bool hasBeggedThisTime = false;
+
+    [HideInInspector] public float currentLeftSpeed = 0f;
+    [HideInInspector] public float currentRightSpeed = 0f;
+    private Vector3 lastLeftPos;
+    private Vector3 lastRightPos;
+
+    void Start()
+    {
+        if (leftHand) lastLeftPos = leftHand.position;
+        if (rightHand) lastRightPos = rightHand.position;
+    }
 
     void Update()
     {
+        // Continuously track hand speed
+        if (leftHand)
+        {
+            currentLeftSpeed = Vector3.Distance(leftHand.position, lastLeftPos) / Time.deltaTime;
+            lastLeftPos = leftHand.position;
+        }
+        if (rightHand)
+        {
+            currentRightSpeed = Vector3.Distance(rightHand.position, lastRightPos) / Time.deltaTime;
+            lastRightPos = rightHand.position;
+        }
+
         if (isFleeing)
         {
-            FleeFromPlayer();
+            FleeLogic();
             return;
         }
 
@@ -49,7 +76,6 @@ public class BegPunchPlayer : MonoBehaviour
         }
     }
 
-    // 1. ADDED THE MISSING FUNCTION
     bool CanAct()
     {
         return Time.time > lastActionTime + actionCooldown;
@@ -77,12 +103,12 @@ public class BegPunchPlayer : MonoBehaviour
             if (!hasBeggedThisTime && readyToAct)
             {
                 ExecuteBeggingLogic();
-                hasBeggedThisTime = true; // Lock it!
+                hasBeggedThisTime = true; // Lock it
                 Debug.Log("<color=cyan>Begging Locked.</color>");
             }
         }
         // 2. UNLOCK: If the player moves hands apart OR walks out of range
-        else if (!isHandsTogether || !isInRange)
+        else if (!isInRange)
         {
             if (hasBeggedThisTime)
             {
@@ -92,7 +118,7 @@ public class BegPunchPlayer : MonoBehaviour
         }
     }
 
-    public void OnPunch(XRBaseController controller)
+    public void OnPunch(ActionBasedController controller)
     {
         if (isScared) return;
 
@@ -100,11 +126,25 @@ public class BegPunchPlayer : MonoBehaviour
         isScared = true;
         isFleeing = true;
 
-        if (audioSource && screamClip) audioSource.PlayOneShot(screamClip);
-        if (animator) animator.SetTrigger("RunAway");
+        // 1. Disable the chatting script
+        if (boysChattingScript != null)
+        {
+            boysChattingScript.enabled = false;
+        }
 
-        Debug.Log("<color=red>NPC Punched!</color>");
+        // 2. Play Audio
+        if (audioSource && screamClip) audioSource.PlayOneShot(screamClip);
+
+        // 3. Set Animation State
+        if (animator)
+        {
+            //animator.SetTrigger("RunAway");       // Trigger the start of the transition
+            animator.SetBool("IsRunning", true);
+        }
+
+        if (controller != null) controller.SendHapticImpulse(0.8f, 0.2f);
     }
+
 
     void ExecuteBeggingLogic()
     {
@@ -126,25 +166,58 @@ public class BegPunchPlayer : MonoBehaviour
         }
     }
 
-    void FleeFromPlayer()
+    void FleeLogic()
     {
-        Vector3 directionAway = (transform.position - playerHead.position).normalized;
-        directionAway.y = 0;
-        transform.position += directionAway * fleeSpeed * Time.deltaTime;
-        transform.forward = directionAway;
+        Vector3 targetDirection;
+        float distanceToTarget;
 
-        if (Vector3.Distance(transform.position, playerHead.position) > stopDistance)
+        if (fleePoint != null)
         {
-            isFleeing = false;
+            targetDirection = (fleePoint.position - transform.position).normalized;
+            distanceToTarget = Vector3.Distance(transform.position, fleePoint.position);
+        }
+        else
+        {
+            // FALLBACK: Run away from the player
+            targetDirection = (transform.position - playerHead.position).normalized;
+            distanceToTarget = Vector3.Distance(transform.position, playerHead.position);
+        }
+
+        targetDirection.y = 0; // Keep NPC on the floor
+
+        transform.position += targetDirection * fleeSpeed * Time.deltaTime;
+
+        // rotate the NPC to face the direction they are running
+        if (targetDirection != Vector3.zero)
+        {
+            Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
+            transform.rotation = Quaternion.Slerp(transform.rotation, targetRotation, Time.deltaTime * 8f);
+        }
+
+        if (fleePoint != null)
+        {
+            if (distanceToTarget < 1.5f) StopFleeing(); // Reached the flee point
+        }
+        else
+        {
+            if (distanceToTarget > stopDistance) StopFleeing();
         }
     }
+
+    void StopFleeing()
+    {
+        isFleeing = false;
+
+        Debug.Log("<color=grey>NPC reached the flee point and disappeared.</color>");
+
+        Destroy(gameObject);
+    }
+
 
     public void SetCanBeg(bool value)
     {
         canBeg = value;
 
-        // NEW: If the player leaves the NPC's area, 
-        // we MUST reset the lock so they can beg again when they return.
         if (canBeg == false)
         {
             hasBeggedThisTime = false;

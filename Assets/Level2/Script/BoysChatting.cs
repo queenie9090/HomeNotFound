@@ -4,7 +4,10 @@ using System.Collections;
 public class BoysChatting : MonoBehaviour
 {
     public AudioSource audioSource;
-    public AudioClip[] clips;
+
+    [Header("Dialogue Sets")]
+    public AudioClip[] normalClips;
+    public AudioClip[] cursingClips;
 
     public bool loopSequence = true;
 
@@ -17,15 +20,25 @@ public class BoysChatting : MonoBehaviour
     {
         do
         {
-            for (int i = 0; i < clips.Length; i++)
-            {
-                if (clips[i] == null) continue;
+            AudioClip[] clipsToUse;
 
-                audioSource.clip = clips[i];
-                audioSource.volume = 4.0f;
+            if (CursingControl.Instance != null && CursingControl.Instance.allowCursing)
+                clipsToUse = cursingClips;
+            else
+                clipsToUse = normalClips;
+
+            if (clipsToUse == null || clipsToUse.Length == 0)
+                yield break;
+
+            for (int i = 0; i < clipsToUse.Length; i++)
+            {
+                if (clipsToUse[i] == null) continue;
+
+                audioSource.clip = clipsToUse[i];
+                audioSource.volume = 1.0f;
                 audioSource.Play();
 
-                yield return new WaitForSeconds(clips[i].length + 4f);
+                yield return new WaitForSeconds(clipsToUse[i].length + 4f);
             }
 
         } while (loopSequence);

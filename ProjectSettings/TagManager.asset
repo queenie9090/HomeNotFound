@@ -8,6 +8,7 @@ TagManager:
   - Bread
   - RecycleItem
   - Bone
+  - Hand
   layers:
   - Default
   - TransparentFX

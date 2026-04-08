@@ -9,8 +9,8 @@ public class NpcBoneDetector : MonoBehaviour
 
     [Header("Running Settings")]
     public Transform[] waypoints;
-    public float runSpeed = 4f;
-    public float rotationSpeed = 5f;
+    public float runSpeed = 0.5f;
+    public float rotationSpeed = 2f;
 
     private int currentWaypointIndex = 0;
     private bool isRunning = false;
@@ -50,13 +50,6 @@ public class NpcBoneDetector : MonoBehaviour
 
     void RunThroughWaypoints()
     {
-        if (currentWaypointIndex >= waypoints.Length)
-        {
-            isRunning = false;
-            if (anim != null) anim.SetBool("isChasing", false); // Stop animation
-            return;
-        }
-
         Transform target = waypoints[currentWaypointIndex];
 
         // Rotation and Move logic
@@ -70,9 +63,16 @@ public class NpcBoneDetector : MonoBehaviour
 
         transform.Translate(Vector3.forward * runSpeed * Time.deltaTime);
 
+        // Check if the NPC has reached the current waypoint
         if (Vector3.Distance(transform.position, target.position) < 1.0f)
         {
             currentWaypointIndex++;
+
+            // Loop back to the first waypoint if we reached the end
+            if (currentWaypointIndex >= waypoints.Length)
+            {
+                currentWaypointIndex = 0;
+            }
         }
     }
 }

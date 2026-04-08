@@ -2,39 +2,30 @@ using UnityEngine;
 
 public class DoorController : MonoBehaviour
 {
-    private Animator anim;
-    private bool isOpen = false;
+    public Animator doorAnimator;
+    private bool playerNear = false;
 
-    void Start()
+    void Update()
     {
-        anim = GetComponent<Animator>();
-    }
-
-    private void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Player"))
+        if (playerNear && Input.GetKeyDown(KeyCode.E))
         {
-            OpenDoor();
+            doorAnimator.SetBool("isOpen", true);
         }
     }
 
-    private void OnTriggerExit(Collider other)
+    void OnTriggerEnter(Collider other)
     {
         if (other.CompareTag("Player"))
         {
-            CloseDoor();
+            playerNear = true;
         }
     }
 
-    void OpenDoor()
+    void OnTriggerExit(Collider other)
     {
-        isOpen = true;
-        anim.SetBool("isOpen", true);
-    }
-
-    void CloseDoor()
-    {
-        isOpen = false;
-        anim.SetBool("isOpen", false);
+        if (other.CompareTag("Player"))
+        {
+            playerNear = false;
+        }
     }
 }

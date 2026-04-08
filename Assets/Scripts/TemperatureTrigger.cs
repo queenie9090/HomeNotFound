@@ -1,15 +1,15 @@
 using UnityEngine;
 
-public class DoorController : MonoBehaviour
+public class TemperatureTrigger : MonoBehaviour
 {
-    public Animator doorAnimator;
+    public ParticleSystem particle;
     private bool playerNear = false;
 
     void Update()
     {
         if (playerNear && Input.GetKeyDown(KeyCode.E))
         {
-            doorAnimator.SetBool("isOpen", true);
+            particle.Play();
         }
     }
 

@@ -7,7 +7,6 @@ public class BoysChatting : MonoBehaviour
 
     [Header("Dialogue Sets")]
     public AudioClip[] normalClips;
-    public AudioClip[] cursingClips;
 
     public bool loopSequence = true;
 
@@ -22,10 +21,7 @@ public class BoysChatting : MonoBehaviour
         {
             AudioClip[] clipsToUse;
 
-            if (CursingControl.Instance != null && CursingControl.Instance.allowCursing)
-                clipsToUse = cursingClips;
-            else
-                clipsToUse = normalClips;
+            clipsToUse = normalClips;
 
             if (clipsToUse == null || clipsToUse.Length == 0)
                 yield break;

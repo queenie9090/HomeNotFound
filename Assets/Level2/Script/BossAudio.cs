@@ -7,7 +7,6 @@ public class AudioBoss : MonoBehaviour
 
     [Header("Dialogue Sets")]
     public AudioClip[] normalClips;
-    public AudioClip[] cursingClips;
 
     private bool playerNearby = false;
     private Coroutine playRoutine;
@@ -45,9 +44,6 @@ public class AudioBoss : MonoBehaviour
         {
             AudioClip[] clipsToUse;
 
-            if (CursingControl.Instance != null && CursingControl.Instance.allowCursing)
-                clipsToUse = cursingClips;
-            else
                 clipsToUse = normalClips;
 
             if (clipsToUse == null || clipsToUse.Length == 0)

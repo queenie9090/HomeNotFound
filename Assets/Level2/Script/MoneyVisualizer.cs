@@ -16,22 +16,19 @@ public class MoneyVisualizer : MonoBehaviour
     public float spacing = 0.15f;
 
     [Header("Pooling Settings")]
-    [Tooltip("How many of each bill to pre-spawn invisibly when the game starts")]
     public int initialPoolSize = 5;
+
+    public Vector3 moneyScale = new Vector3(1f, 1f, 1f);
 
     private List<GameObject> rm10Pool = new List<GameObject>();
     private List<GameObject> rm5Pool = new List<GameObject>();
     private List<GameObject> rm1Pool = new List<GameObject>();
 
-    // Awake runs the very first time this GameObject is turned on
     private void Awake()
     {
-        // 1. Pre-warm the pools before the menu even opens
         PrewarmPool(rm10Pool, rm10Prefab, initialPoolSize);
         PrewarmPool(rm5Pool, rm5Prefab, initialPoolSize);
         PrewarmPool(rm1Pool, rm1Prefab, initialPoolSize);
-
-        Debug.Log($"<color=lime>[MoneyVis]</color> Pools pre-warmed with {initialPoolSize} of each prefab.");
     }
 
     private void PrewarmPool(List<GameObject> pool, GameObject prefab, int count)
@@ -40,24 +37,22 @@ public class MoneyVisualizer : MonoBehaviour
 
         for (int i = 0; i < count; i++)
         {
-            // Spawn it and immediately hide it
             GameObject newObj = Instantiate(prefab, displayParent);
             newObj.SetActive(false);
             pool.Add(newObj);
         }
     }
 
-    // OnEnable runs every single time you press the 'N' button to show the menu
-    private void OnEnable()
+    public void RefreshDisplay()
     {
         if (manager == null)
         {
-            Debug.LogError("<color=red>[MoneyVis]</color> Level2Manager.Instance is NULL!");
+            Debug.LogError("<color=red>[MoneyVis]</color> Level2Manager is NULL!");
             return;
         }
 
         int currentCash = manager.playerMoney;
-        Debug.Log($"<color=cyan>[MoneyVis]</color> Menu opened. Player currently has: RM {currentCash}");
+        Debug.Log($"<color=cyan>[MoneyVis]</color> Menu opened. Player has: RM {currentCash}");
 
         UpdateVisuals(currentCash);
     }
@@ -89,25 +84,22 @@ public class MoneyVisualizer : MonoBehaviour
         {
             if (i < neededAmount)
             {
-                // If the player somehow got rich and needs MORE than the 5 we pre-warmed, 
-                // this safely spawns extras on the fly.
                 if (i >= pool.Count)
                 {
                     GameObject newObj = Instantiate(prefab, displayParent);
                     pool.Add(newObj);
                 }
 
-                // Activate and position the money
                 GameObject obj = pool[i];
                 obj.SetActive(true);
-                obj.transform.localPosition = new Vector3(currentX, 0, 0);
-                obj.transform.localRotation = prefab.transform.rotation;
+                obj.transform.localPosition = new Vector3(0, currentX, 0);
+                obj.transform.localRotation = Quaternion.Euler(270f, 0f, 0f);
+                obj.transform.localScale = moneyScale;
 
                 currentX += spacing;
             }
             else
             {
-                // We have extra pre-warmed money sitting around, just make sure it's hidden
                 pool[i].SetActive(false);
             }
         }

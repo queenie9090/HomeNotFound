@@ -22,6 +22,10 @@ public class IntroSequence_lvl1 : MonoBehaviour
         yield return new WaitForSeconds(5.7f);
         DialogueManager.Instance.ShowDialogue("I just need to survive today.");
 
+        // 3. The final "Mission" statement
+        yield return new WaitForSeconds(6.1f);
+        DialogueManager.Instance.ShowDialogue("Press <color=yellow>(Y)</color> for Journal");
+
         // At this point, the player is fully "in" the game and looking for the Journal.
     }
 }

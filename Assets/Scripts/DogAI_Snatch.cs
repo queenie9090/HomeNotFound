@@ -79,68 +79,65 @@ public class DogAI_Snatch : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        // ONLY do this if it's the bread and the dog hasn't already snatched it
         if (other.CompareTag("Bread") && !isRunningAway)
         {
-            Debug.Log("[STATE]: Bread Snatched - Triggering Feedback");
-
             snatchedBread = other.gameObject;
             isRunningAway = true;
 
-            // 1. PLAY THE SNATCH SOUND
-            if (snatchSource != null)
-            {
-                snatchSource.Play();
-                Debug.Log("[AUDIO]: Playing Crunch Sound at " + snatchSource.volume + " volume.");
-            }
-            else
-            {
-                Debug.LogError("[AUDIO]: SnatchSource is MISSING in the Inspector!");
-            }
+            if (snatchSource != null) snatchSource.Play();
 
-            // 2. TRIGGER HAPTICS (Vibration)
-            // We get the grab component to find which hand is holding it
             var interactable = snatchedBread.GetComponent<UnityEngine.XR.Interaction.Toolkit.Interactables.XRGrabInteractable>();
+
+            // 1. DISCONNECT FROM PLAYER FIRST
             if (interactable != null && interactable.isSelected)
             {
-                // This sends the vibration to the specific controller holding the bread
-                interactable.interactorsSelecting[0].transform.GetComponent<ActionBasedController>().SendHapticImpulse(0.7f, 0.2f);
-                Debug.Log("[FEEDBACK]: Haptic Impulse Sent to Player");
+                var interactor = interactable.interactorsSelecting[0];
+                var controller = interactor.transform.GetComponentInParent<ActionBasedController>();
+                if (controller != null) controller.SendHapticImpulse(0.7f, 0.2f);
+
+                interactable.interactionManager.CancelInteractableSelection((UnityEngine.XR.Interaction.Toolkit.Interactables.IXRSelectInteractable)interactable);
             }
 
-            // 3. LOGIC: Disable grab and physics
-            if (interactable != null) interactable.enabled = false;
+            // 2. CHANGE LAYER IMMEDIATELY 
+            // This is the "Magic Fix" for the MissingReference errors.
+            // It makes the XR system stop looking at the bread instantly.
+            snatchedBread.layer = LayerMask.NameToLayer("Ignore Raycast");
 
-            Collider breadCollider = other.GetComponent<Collider>();
-            if (breadCollider != null) breadCollider.enabled = false;
-
-            Rigidbody breadRb = other.GetComponent<Rigidbody>();
-            if (breadRb != null) breadRb.isKinematic = true;
-
-
-            // 3. Play the Sequence
-            if (DialogueManager.Instance != null)
-                StartCoroutine(PlaySnatchSequence());
-
-            if (JournalManager.Instance != null)
-            {
-                JournalManager.Instance.CompleteTask(1); // Mark in the book
-            }
-
-            if (MissionManager.Instance != null)
-            {
-                MissionManager.Instance.MarkDogComplete(); // Update the level exit logic
-            }
-
-            // 4. ATTACH TO MOUTH
+            // 3. ATTACH TO MOUTH (Do this before disabling components)
             snatchedBread.transform.SetParent(mouthPoint);
-            foreach (Transform child in snatchedBread.transform)
-            {
-                child.SetParent(null);
-            }
             snatchedBread.transform.localPosition = Vector3.zero;
+            snatchedBread.transform.localRotation = Quaternion.identity;
+            // 4. PHYSICS & COMPONENT CLEANUP
+            if (snatchedBread != null)
+            {
+                // Use ?. (Null-conditional operator) to safely check if the component exists
+                // and hasn't been destroyed yet by the Editor shutdown.
 
-            Debug.Log("[STATE]: Running to Escape Point");
+                if (interactable != null) interactable.enabled = false;
+
+                var outline = snatchedBread.GetComponentInChildren<Outline>();
+                if (outline != null) outline.enabled = false;
+
+                var highlighter = snatchedBread.GetComponentInChildren<VRHoverHighlighter>();
+                if (highlighter != null) highlighter.enabled = false;
+
+                Rigidbody breadRb = snatchedBread.GetComponent<Rigidbody>();
+                if (breadRb != null)
+                {
+                    breadRb.isKinematic = true;
+                    breadRb.detectCollisions = false;
+                }
+
+                Collider breadCol = snatchedBread.GetComponent<Collider>();
+                if (breadCol != null) breadCol.enabled = false;
+            }
+
+            // 5. EXTERNAL SYSTEMS
+            if (DialogueManager.Instance != null) StartCoroutine(PlaySnatchSequence());
+            if (JournalManager.Instance != null) JournalManager.Instance.CompleteTask(1);
+            if (MissionManager.Instance != null) MissionManager.Instance.MarkDogComplete();
+
+            Debug.Log("[STATE]: Bread Snatched and Reparented");
         }
     }
 

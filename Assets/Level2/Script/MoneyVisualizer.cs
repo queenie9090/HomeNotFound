@@ -11,13 +11,18 @@ public class MoneyVisualizer : MonoBehaviour
     public GameObject rm5Prefab;
     public GameObject rm1Prefab;
 
-    [Header("Display Settings")]
+    [Header("Text Display")]
+    public MoneyTextDisplay textDisplay;
+
+    [Header("Grid & Display Settings")]
     public Transform displayParent;
-    public float spacing = 0.15f;
+    [Tooltip("How many bills can fit in a single column before starting a new one")]
+    public int maxItemsPerColumn = 4; // YOUR NEW CONTROL VARIABLE
+    public float ySpacing = 0.15f;    // Spacing going UP
+    public float xSpacing = 0.15f;    // Spacing going RIGHT
 
     [Header("Pooling Settings")]
     public int initialPoolSize = 5;
-
     public Vector3 moneyScale = new Vector3(1f, 1f, 1f);
 
     private List<GameObject> rm10Pool = new List<GameObject>();
@@ -55,6 +60,11 @@ public class MoneyVisualizer : MonoBehaviour
         Debug.Log($"<color=cyan>[MoneyVis]</color> Menu opened. Player has: RM {currentCash}");
 
         UpdateVisuals(currentCash);
+
+        if (textDisplay != null)
+        {
+            textDisplay.RefreshText();
+        }
     }
 
     public void UpdateVisuals(int totalMoney)
@@ -69,15 +79,17 @@ public class MoneyVisualizer : MonoBehaviour
 
         int numRM1 = totalMoney / 1;
 
-        float currentXOffset = 0f;
-        currentXOffset = ManagePool(rm10Pool, rm10Prefab, numRM10, currentXOffset);
-        currentXOffset = ManagePool(rm5Pool, rm5Prefab, numRM5, currentXOffset);
-        currentXOffset = ManagePool(rm1Pool, rm1Prefab, numRM1, currentXOffset);
+        // Instead of distance, we now track the total COUNT of money spawned
+        int currentItemIndex = 0;
+
+        currentItemIndex = ManagePool(rm10Pool, rm10Prefab, numRM10, currentItemIndex);
+        currentItemIndex = ManagePool(rm5Pool, rm5Prefab, numRM5, currentItemIndex);
+        currentItemIndex = ManagePool(rm1Pool, rm1Prefab, numRM1, currentItemIndex);
     }
 
-    private float ManagePool(List<GameObject> pool, GameObject prefab, int neededAmount, float startX)
+    private int ManagePool(List<GameObject> pool, GameObject prefab, int neededAmount, int startIndex)
     {
-        float currentX = startX;
+        int currentIndex = startIndex;
         int loopCount = Mathf.Max(pool.Count, neededAmount);
 
         for (int i = 0; i < loopCount; i++)
@@ -92,11 +104,24 @@ public class MoneyVisualizer : MonoBehaviour
 
                 GameObject obj = pool[i];
                 obj.SetActive(true);
-                obj.transform.localPosition = new Vector3(0, currentX, 0);
+
+                // --- GRID MATH ---
+                // Divide the index by max items to figure out which column we are in
+                int columnIndex = currentIndex / maxItemsPerColumn;
+
+                // Use modulo (%) to figure out how high up we are in that specific column
+                int positionInColumn = currentIndex % maxItemsPerColumn;
+
+                float targetX = columnIndex * xSpacing;
+                float targetY = positionInColumn * ySpacing;
+
+                // Apply the calculated position
+                obj.transform.localPosition = new Vector3(targetX, targetY, 0);
+
                 obj.transform.localRotation = Quaternion.Euler(270f, 0f, 0f);
                 obj.transform.localScale = moneyScale;
 
-                currentX += spacing;
+                currentIndex++; // Move on to the next item
             }
             else
             {
@@ -104,6 +129,6 @@ public class MoneyVisualizer : MonoBehaviour
             }
         }
 
-        return currentX;
+        return currentIndex; // Pass the updated count to the next pool
     }
 }

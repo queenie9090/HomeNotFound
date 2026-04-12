@@ -9,6 +9,7 @@ TagManager:
   - RecycleItem
   - Bone
   - Hand
+  - Food
   layers:
   - Default
   - TransparentFX

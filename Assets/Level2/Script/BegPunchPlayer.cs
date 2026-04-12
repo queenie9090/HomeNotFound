@@ -10,6 +10,10 @@ public class BegPunchPlayer : MonoBehaviour
     public Transform leftHand;
     public Transform rightHand;
 
+    [Header("Retaliation Settings")]
+    public NpcPunchAction punchActionScript;
+    [Range(0, 100)] public int fightBackChance = 50;
+
     [Header("Settings")]
     public float begDistance = 3.0f;
     public float handsTogetherThreshold = 0.4f;
@@ -17,7 +21,7 @@ public class BegPunchPlayer : MonoBehaviour
     private float lastActionTime = 0f;
 
     [Header("Fleeing Settings")]
-    public Transform fleePoint; 
+    public Transform fleePoint;
     public float fleeSpeed = 5f;
     public float stopDistance = 15f;
     private bool isFleeing = false;
@@ -34,7 +38,8 @@ public class BegPunchPlayer : MonoBehaviour
     public AudioClip screamClip;
 
     [Header("State Tracking")]
-    public bool canBeg = false;
+    // CHANGED: Renamed from canBeg to canInteract
+    public bool canInteract = false;
     private bool hasBeggedThisTime = false;
 
     [HideInInspector] public float currentLeftSpeed = 0f;
@@ -50,7 +55,6 @@ public class BegPunchPlayer : MonoBehaviour
 
     void Update()
     {
-        // Continuously track hand speed
         if (leftHand)
         {
             currentLeftSpeed = Vector3.Distance(leftHand.position, lastLeftPos) / Time.deltaTime;
@@ -70,7 +74,8 @@ public class BegPunchPlayer : MonoBehaviour
 
         if (isScared) return;
 
-        if (canBeg)
+        // CHANGED: Updated variable name
+        if (canInteract)
         {
             CheckForBegging();
         }
@@ -92,22 +97,19 @@ public class BegPunchPlayer : MonoBehaviour
         float distToNPC = Vector3.Distance(playerPos, npcPos);
         float handDist = Vector3.Distance(leftHand.position, rightHand.position);
 
-        // Logic check
         bool isInRange = distToNPC < begDistance;
         bool isHandsTogether = handDist < handsTogetherThreshold;
         bool readyToAct = Time.time > lastActionTime + actionCooldown;
 
-        // 1. TRIGGER: If in range AND hands together AND not locked
         if (isInRange && isHandsTogether)
         {
             if (!hasBeggedThisTime && readyToAct)
             {
                 ExecuteBeggingLogic();
-                hasBeggedThisTime = true; // Lock it
+                hasBeggedThisTime = true;
                 Debug.Log("<color=cyan>Begging Locked.</color>");
             }
         }
-        // 2. UNLOCK: If the player moves hands apart OR walks out of range
         else if (!isInRange)
         {
             if (hasBeggedThisTime)
@@ -120,31 +122,49 @@ public class BegPunchPlayer : MonoBehaviour
 
     public void OnPunch(ActionBasedController controller)
     {
+        // --- NEW: Block the punch if the player hasn't entered the trigger zone! ---
+        if (!canInteract)
+        {
+            Debug.Log("<color=grey>Punch ignored. Player has not unlocked interaction yet.</color>");
+            return;
+        }
+
         if (isScared) return;
 
         lastActionTime = Time.time;
         isScared = true;
-        isFleeing = true;
-
-        // 1. Disable the chatting script
-        if (boysChattingScript != null)
-        {
-            boysChattingScript.enabled = false;
-        }
-
-        // 2. Play Audio
-        if (audioSource && screamClip) audioSource.PlayOneShot(screamClip);
-
-        // 3. Set Animation State
-        if (animator)
-        {
-            //animator.SetTrigger("RunAway");       // Trigger the start of the transition
-            animator.SetBool("IsRunning", true);
-        }
 
         if (controller != null) controller.SendHapticImpulse(0.8f, 0.2f);
+
+        int roll = Random.Range(0, 100);
+
+        if (roll < fightBackChance && punchActionScript != null)
+        {
+            Debug.Log("<color=red>NPC is Fighting Back!</color>");
+
+            if (boysChattingScript != null) boysChattingScript.enabled = false;
+
+            punchActionScript.ExecutePunch(this);
+        }
+        else
+        {
+            isFleeing = true;
+            if (boysChattingScript != null) boysChattingScript.enabled = false;
+            if (audioSource && screamClip) audioSource.PlayOneShot(screamClip);
+            if (animator) animator.SetBool("IsRunning", true);
+
+            Debug.Log("<color=red>NPC Punched! Fleeing...</color>");
+        }
     }
 
+    public void ResumeNormalActivity()
+    {
+        isScared = false;
+
+        if (boysChattingScript != null) boysChattingScript.enabled = true;
+
+        Debug.Log("<color=white>NPC calmed down and resumed normal activity.</color>");
+    }
 
     void ExecuteBeggingLogic()
     {
@@ -178,16 +198,14 @@ public class BegPunchPlayer : MonoBehaviour
         }
         else
         {
-            // FALLBACK: Run away from the player
             targetDirection = (transform.position - playerHead.position).normalized;
             distanceToTarget = Vector3.Distance(transform.position, playerHead.position);
         }
 
-        targetDirection.y = 0; // Keep NPC on the floor
+        targetDirection.y = 0;
 
         transform.position += targetDirection * fleeSpeed * Time.deltaTime;
 
-        // rotate the NPC to face the direction they are running
         if (targetDirection != Vector3.zero)
         {
             Quaternion targetRotation = Quaternion.LookRotation(targetDirection);
@@ -196,7 +214,7 @@ public class BegPunchPlayer : MonoBehaviour
 
         if (fleePoint != null)
         {
-            if (distanceToTarget < 1.5f) StopFleeing(); // Reached the flee point
+            if (distanceToTarget < 1.5f) StopFleeing();
         }
         else
         {
@@ -207,21 +225,19 @@ public class BegPunchPlayer : MonoBehaviour
     void StopFleeing()
     {
         isFleeing = false;
-
         Debug.Log("<color=grey>NPC reached the flee point and disappeared.</color>");
-
         Destroy(gameObject);
     }
 
-
-    public void SetCanBeg(bool value)
+    // CHANGED: Renamed function to match the trigger script
+    public void SetCanInteract(bool value)
     {
-        canBeg = value;
+        canInteract = value;
 
-        if (canBeg == false)
+        if (canInteract == false)
         {
             hasBeggedThisTime = false;
-            Debug.Log("<color=white>Player left. Begging state fully reset.</color>");
+            Debug.Log("<color=white>Player left. Interaction state fully reset.</color>");
         }
     }
 }

@@ -8,7 +8,7 @@ public class NpcHitbox : MonoBehaviour
 
     private void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Hand") || other.CompareTag("Player"))
+        if (other.CompareTag("Hand"))
         {
             // which hand hit us, checking distance
             float distToLeft = Vector3.Distance(transform.position, mainScript.leftHand.position);

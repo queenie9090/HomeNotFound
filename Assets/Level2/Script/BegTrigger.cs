@@ -3,6 +3,8 @@ using UnityEngine;
 public class BegTrigger : MonoBehaviour
 {
     public BegPunchPlayer npc;
+    public StealPunchPlayer stealNPC;
+    public string dialogueText;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -10,12 +12,16 @@ public class BegTrigger : MonoBehaviour
         {
             var gm = Level2Manager.Instance;
             if (gm.currentState == Level2Manager.GameState.DiscoveredPriceIncreased)
-            { 
-            DialogueManager.Instance.ShowDialogue("I need to earn some money... Maybe I can beg for some change?");
-            npc.SetCanBeg(true);
-        }
-        else
-            return;
+            {
+                DialogueManager.Instance.ShowDialogue(dialogueText);
+
+                if (npc != null && stealNPC == null)
+                    npc.SetCanInteract(true);
+                else if (stealNPC != null && npc == null)
+                    stealNPC.SetCanSteal(true);
+            }
+            else
+                return;
         }
     }
 
@@ -23,7 +29,10 @@ public class BegTrigger : MonoBehaviour
     {
         if (other.CompareTag("Player"))
         {
-            npc.SetCanBeg(false);
+            if (npc != null && stealNPC == null)
+                npc.SetCanInteract(false);
+            else if (stealNPC != null && npc == null)
+                stealNPC.SetCanSteal(false);
         }
     }
 }

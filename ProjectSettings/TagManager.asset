@@ -9,6 +9,7 @@ TagManager:
   - RecycleItem
   - Bone
   - Hand
+  - Food
   layers:
   - Default
   - TransparentFX
@@ -22,7 +23,7 @@ TagManager:
   - Player
   - Environment
   - Dog
-  - 
+  - Teleport
   - 
   - 
   - 

@@ -7,6 +7,8 @@ public class RestaurantTrigger : MonoBehaviour
     public GameObject journalNote1;
     public GameObject journalNote2;
 
+    public GameObject outsideTrigger;
+
     void Start()
     {
         journalManager2.SetActive(false);
@@ -22,6 +24,8 @@ public class RestaurantTrigger : MonoBehaviour
             if (gm.currentState == Level2Manager.GameState.EnterLevel)
             {
                 gm.SetState(Level2Manager.GameState.NeedMoney);
+                DialogueManager.Instance.ShowDialogue("RM 12.5 for a bowl of rice?!");
+                outsideTrigger.SetActive(true);
             }
             if (gm.currentState == Level2Manager.GameState.PriceIncreased)
             {
@@ -29,11 +33,12 @@ public class RestaurantTrigger : MonoBehaviour
                 journalManager2.SetActive(true);
                 journalNote1.SetActive(false);
                 journalNote2.SetActive(true);
+                outsideTrigger.SetActive(true);
                 DialogueManager.Instance.ShowDialogue("WHAT?! The food price has increased? Due to increased cost... of course...");
                 Debug.Log("Dialog should display");
                 gm.SetState(Level2Manager.GameState.DiscoveredPriceIncreased);
             }
-            else if (gm.currentState == Level2Manager.GameState.CanBuyFood) //need to change
+            else if (gm.currentState == Level2Manager.GameState.CanBuyFood)
             {
                 gm.SetState(Level2Manager.GameState.LevelComplete);
             }

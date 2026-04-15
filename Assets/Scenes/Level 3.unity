@@ -17323,7 +17323,7 @@ AudioSource:
   OutputAudioMixerGroup: {fileID: 0}
   m_audioClip: {fileID: 0}
   m_Resource: {fileID: 0}
-  m_PlayOnAwake: 0
+  m_PlayOnAwake: 1
   m_Volume: 1
   m_Pitch: 1
   Loop: 1
@@ -17335,7 +17335,7 @@ AudioSource:
   MinDistance: 2
   MaxDistance: 15
   Pan2D: 0
-  rolloffMode: 0
+  rolloffMode: 1
   BypassEffects: 0
   BypassListenerEffects: 0
   BypassReverbZones: 0
@@ -17420,6 +17420,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b7d3905dce926043975c2cd0ae57d4e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: '::'
+  anim: {fileID: 577848633}
   player: {fileID: 2070843751}
   playerHand: {fileID: 1424707130}
   npc: {fileID: 1503834273}
@@ -17430,6 +17431,14 @@ MonoBehaviour:
     serializedVersion: 2
     m_Bits: 1025
   wanderRadius: 5
+  dialogueText: {fileID: 593323494}
+  snatchDialogue:
+  - What's that sound?
+  - Is that a dog?
+  - Maybe I slound open the door....
+  - Oh... good boy
+  stayPoint1: {fileID: 1191693585}
+  stayPoint2: {fileID: 1782664742}
 --- !u!54 &577848630
 Rigidbody:
   m_ObjectHideFlags: 0
@@ -17478,6 +17487,11 @@ BoxCollider:
   serializedVersion: 3
   m_Size: {x: 0.41240692, y: 0.79335624, z: 0.9944563}
   m_Center: {x: -0.009399414, y: 0.39184698, z: 0.09623146}
+--- !u!95 &577848633 stripped
+Animator:
+  m_CorrespondingSourceObject: {fileID: 5475111282331158713, guid: cbd015c8392edc84097e8e4de87a9d0a, type: 3}
+  m_PrefabInstance: {fileID: 577848622}
+  m_PrefabAsset: {fileID: 0}
 --- !u!1 &578667002
 GameObject:
   m_ObjectHideFlags: 0
@@ -24410,8 +24424,8 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 2
-  MaxDistance: 15
+  MinDistance: 1
+  MaxDistance: 10
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -26466,9 +26480,7 @@ MonoBehaviour:
   taskText: {fileID: 2052415557}
   completedColor: green
   tasks:
-  - taskDescription: Find something warm to wear.
-    isDone: 0
-  - taskDescription: Find something to eat.
+  - taskDescription: 
     isDone: 0
 --- !u!1001 &924435814
 PrefabInstance:
@@ -33230,6 +33242,37 @@ MonoBehaviour:
   lightSource: {fileID: 1190542274}
   minIntensity: 5
   maxIntensity: 30
+--- !u!1 &1191693584
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1191693585}
+  m_Layer: 0
+  m_Name: DogStayPoint
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1191693585
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1191693584}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 4.36, y: 0.54, z: -7.703}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1196410688
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -51954,8 +51997,8 @@ AudioSource:
   SpatializePostEffects: 0
   Priority: 128
   DopplerLevel: 1
-  MinDistance: 2
-  MaxDistance: 15
+  MinDistance: 1
+  MaxDistance: 10
   Pan2D: 0
   rolloffMode: 0
   BypassEffects: 0
@@ -53324,6 +53367,37 @@ Transform:
   m_CorrespondingSourceObject: {fileID: 8164523353831656320, guid: 7b26d246ced93914e80d1cdf3d152a53, type: 3}
   m_PrefabInstance: {fileID: 1779857737}
   m_PrefabAsset: {fileID: 0}
+--- !u!1 &1782664741
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 1782664742}
+  m_Layer: 0
+  m_Name: DogStayPoint2
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!4 &1782664742
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 1782664741}
+  serializedVersion: 2
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 5.01, y: 0.54, z: -15.2}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_ConstrainProportionsScale: 0
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1001 &1783150908
 PrefabInstance:
   m_ObjectHideFlags: 0
@@ -61407,6 +61481,8 @@ MonoBehaviour:
   door: {fileID: 578667004}
   openAngle: 90
   speed: 2
+  dog: {fileID: 577848628}
+  stayPoint2: {fileID: 1782664742}
 --- !u!33 &840935862102810837
 MeshFilter:
   m_ObjectHideFlags: 0
@@ -62799,6 +62875,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: Assembly-CSharp::ShowerTemperature
   waterParticles: {fileID: 1527012882}
+  npc: {fileID: 1503834270}
+  dog: {fileID: 577848628}
+  stayPoint1: {fileID: 1191693585}
 --- !u!4 &7187746973725329779
 Transform:
   m_ObjectHideFlags: 0
@@ -63828,3 +63907,5 @@ SceneRoots:
   - {fileID: 6658514368127270794}
   - {fileID: 578667004}
   - {fileID: 1527012883}
+  - {fileID: 1191693585}
+  - {fileID: 1782664742}

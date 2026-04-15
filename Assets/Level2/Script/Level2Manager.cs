@@ -98,9 +98,10 @@ public class Level2Manager : MonoBehaviour
                 foodPrice = 25;
                 Debug.Log("Dialog should display");
                 SetState(GameState.PriceIncreased);
+                
 
             }
-            else if (currentState == GameState.EarningBegging)
+            else if (currentState == GameState.DiscoveredPriceIncreased)
             {
                 DialogueManager.Instance.ShowDialogue("Finally! I have enough money! Lets go check out that Mamak again!");
                 Debug.Log("Dialog should display");

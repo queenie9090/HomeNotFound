@@ -16,6 +16,7 @@ public class RecycleTrigger : MonoBehaviour
             {
                 enableRecycle.SetActiveRecycle();
                 gm.SetState(Level2Manager.GameState.DiscoverRecycle);
+                DialogueManager.Instance.ShowDialogue("I can find some recycle items to sell.");
             }
         }
     }

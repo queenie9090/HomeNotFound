@@ -38,7 +38,6 @@ public class BegPunchPlayer : MonoBehaviour
     public AudioClip screamClip;
 
     [Header("State Tracking")]
-    // CHANGED: Renamed from canBeg to canInteract
     public bool canInteract = false;
     private bool hasBeggedThisTime = false;
 
@@ -74,7 +73,6 @@ public class BegPunchPlayer : MonoBehaviour
 
         if (isScared) return;
 
-        // CHANGED: Updated variable name
         if (canInteract)
         {
             CheckForBegging();
@@ -97,6 +95,7 @@ public class BegPunchPlayer : MonoBehaviour
         float distToNPC = Vector3.Distance(playerPos, npcPos);
         float handDist = Vector3.Distance(leftHand.position, rightHand.position);
 
+        
         bool isInRange = distToNPC < begDistance;
         bool isHandsTogether = handDist < handsTogetherThreshold;
         bool readyToAct = Time.time > lastActionTime + actionCooldown;
@@ -118,11 +117,11 @@ public class BegPunchPlayer : MonoBehaviour
                 Debug.Log("<color=white>Begging Unlocked.</color> (Hands separated or stepped back)");
             }
         }
+
     }
 
     public void OnPunch(ActionBasedController controller)
     {
-        // --- NEW: Block the punch if the player hasn't entered the trigger zone! ---
         if (!canInteract)
         {
             Debug.Log("<color=grey>Punch ignored. Player has not unlocked interaction yet.</color>");
@@ -229,7 +228,6 @@ public class BegPunchPlayer : MonoBehaviour
         Destroy(gameObject);
     }
 
-    // CHANGED: Renamed function to match the trigger script
     public void SetCanInteract(bool value)
     {
         canInteract = value;

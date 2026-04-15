@@ -15,6 +15,8 @@ public class ShowerTemperature : MonoBehaviour
     private float cooldownTime = 1.0f; // Wait 1 second between touches
     private float nextToggleTime = 0f;
 
+    private bool hasCompletedShowerTask = false;
+
     void Start()
     {
         if (waterParticles != null)
@@ -51,6 +53,15 @@ public class ShowerTemperature : MonoBehaviour
         {
             waterParticles.Play();
             Debug.Log("Shower turned ON");
+
+            if (!hasCompletedShowerTask)
+            {
+                if (JournalInLv3.Instance != null)
+                {
+                    JournalInLv3.Instance.CompleteTask(2);
+                }
+                hasCompletedShowerTask = true;
+            }
 
             if (dog != null)
             {

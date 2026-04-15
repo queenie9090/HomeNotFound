@@ -9,6 +9,9 @@ public class Door : MonoBehaviour
     private bool isOpen = false;
     private bool playerHandInside = false;
 
+    public DogAiInLv3 dog;
+    public Transform stayPoint2;
+
     void Start()
     {
         Debug.Log("Script started");
@@ -36,6 +39,12 @@ public class Door : MonoBehaviour
         if (isOpen)
         {
             Debug.Log("Door is OPEN");
+
+            // Tell dog to move to second stay point
+            if (dog != null && stayPoint2 != null)
+            {
+                dog.GoToStayPoint(stayPoint2);
+            }
         }
         else
         {

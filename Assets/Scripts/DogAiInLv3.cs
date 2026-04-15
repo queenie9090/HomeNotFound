@@ -1,7 +1,11 @@
 ﻿using UnityEngine;
+using TMPro;
+using System.Collections;
 
 public class DogAiInLv3 : MonoBehaviour
 {
+    public Animator anim;
+
     [Header("References")]
     public Transform player;
     public Transform playerHand;
@@ -20,8 +24,26 @@ public class DogAiInLv3 : MonoBehaviour
     private Vector3 wanderTarget;
     private float wanderTimer;
 
+    [Header("Dialogue UI")]
+    public TMP_Text dialogueText;
+
+    [Header("Custom Dialogue")]
+    [TextArea(3, 10)]
+    public string[] snatchDialogue;
+
+    private bool dialogueShown = false;
+
+    [Header("Stay Points")]
+    public Transform stayPoint1;
+    public Transform stayPoint2;
+    private bool goToStayPoint = false;
+    private Transform currentStayPoint;
+
     void Start()
     {
+        if (anim == null)
+            anim = GetComponent<Animator>();
+
         cachedBone = GameObject.FindGameObjectWithTag("Bone");
         if (npc != null) npcDetector = npc.GetComponent<NpcBoneDetector>();
         PickNewWanderTarget();
@@ -29,7 +51,45 @@ public class DogAiInLv3 : MonoBehaviour
 
     void Update()
     {
+        if (goToStayPoint && currentStayPoint != null)
+        {
+            float dist = Vector3.Distance(transform.position, currentStayPoint.position);
+
+            if (dist > stopDistance)
+            {
+                anim.SetBool("isRunning", true);
+                anim.SetBool("isWaiting", false);
+
+                PursueTarget(currentStayPoint.position);
+            }
+            else
+            {
+                anim.SetBool("isRunning", false);
+
+                if (currentStayPoint == stayPoint1)
+                {
+                    anim.SetBool("isWaiting", true);
+                    anim.SetBool("isSitting", false);
+                }
+                else if (currentStayPoint == stayPoint2)
+                {
+                    anim.SetBool("isWaiting", false);
+                    anim.SetBool("isSitting", true); // trigger sitting animation
+                }
+
+                if (!dialogueShown)
+                {
+                    ShowDialogue();
+                    dialogueShown = true;
+                }
+            }
+
+            return;
+        }
+
+
         bool blocked = IsPathBlocked();
+
 
         if (blocked)
         {
@@ -38,17 +98,22 @@ public class DogAiInLv3 : MonoBehaviour
         }
         else
         {
-            // LOGIC
             if (npcDetector != null && npcDetector.isTargetedByDog)
             {
+                anim.SetBool("isRunning", true);
+                anim.SetBool("isWaiting", false);
                 PursueTarget(npc.position);
             }
             else if (IsHoldingBone())
             {
+                anim.SetBool("isRunning", true);
+                anim.SetBool("isWaiting", false);
                 PursueTarget(player.position);
             }
             else
             {
+                anim.SetBool("isRunning", false);
+                anim.SetBool("isWaiting", false);
                 Wander();
             }
         }
@@ -130,4 +195,37 @@ public class DogAiInLv3 : MonoBehaviour
         wanderTarget.y = transform.position.y;
         wanderTimer = 0;
     }
+
+    public void GoToStayPoint(Transform target)
+    {
+        currentStayPoint = target;
+        goToStayPoint = true;
+
+        anim.SetBool("isWaiting", false);
+        anim.SetBool("isSitting", false);
+
+        dialogueShown = false;
+    }
+
+    void ShowDialogue()
+    {
+        if (currentStayPoint == stayPoint1)
+        {
+            StartCoroutine(PlayDialogueSequence(0, 3)); // show element 0,1,2
+        }
+        else if (currentStayPoint == stayPoint2)
+        {
+            if (snatchDialogue.Length > 3)
+                DialogueManager.Instance.ShowDialogue(snatchDialogue[3]);
+        }
+    }
+
+    IEnumerator PlayDialogueSequence(int startIndex, int count)
+{
+    for (int i = startIndex; i < startIndex + count && i < snatchDialogue.Length; i++)
+    {
+        DialogueManager.Instance.ShowDialogue(snatchDialogue[i]);
+        yield return new WaitForSeconds(3f); // time between dialogue lines
+    }
+}
 }

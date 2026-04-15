@@ -5,6 +5,11 @@ public class ShowerTemperature : MonoBehaviour
     [Header("Shower Settings")]
     public ParticleSystem waterParticles;
 
+    [Header("NPC Settings")]
+    public GameObject npc;
+    public DogAiInLv3 dog;
+    public Transform stayPoint1;
+
     private bool isWaterRunning = false;
 
     private float cooldownTime = 1.0f; // Wait 1 second between touches
@@ -27,6 +32,11 @@ public class ShowerTemperature : MonoBehaviour
             {
                 ToggleWater();
 
+                if (npc != null)
+                {
+                    npc.SetActive(false);
+                }
+
                 // Set the next allowed time to 1 second in the future
                 nextToggleTime = Time.time + cooldownTime;
             }
@@ -41,6 +51,11 @@ public class ShowerTemperature : MonoBehaviour
         {
             waterParticles.Play();
             Debug.Log("Shower turned ON");
+
+            if (dog != null)
+            {
+                dog.GoToStayPoint(stayPoint1);
+            }
         }
         else
         {

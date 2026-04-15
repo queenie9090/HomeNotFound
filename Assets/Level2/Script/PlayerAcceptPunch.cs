@@ -1,5 +1,5 @@
 using UnityEngine;
-using UnityEngine.XR.Interaction.Toolkit.Locomotion.Comfort; 
+using UnityEngine.XR.Interaction.Toolkit.Locomotion.Comfort;
 
 public class PlayerAcceptPunch : MonoBehaviour, ITunnelingVignetteProvider
 {
@@ -7,18 +7,17 @@ public class PlayerAcceptPunch : MonoBehaviour, ITunnelingVignetteProvider
     public AudioClip punchDialogueClip;
 
     [Header("Hurt Settings")]
-    [Tooltip("Drag the GameObject holding your TunnelingVignetteController here")]
-    public TunnelingVignetteController vignetteController;
+    [Tooltip("Drag ONLY your duplicated HurtVignette here!")]
+    public TunnelingVignetteController redVignetteController;
     public int PunchCounter = 0;
 
     [Header("Hurt Visuals")]
-    [Tooltip("Configure your custom damage colors and sizes here!")]
     public VignetteParameters hurtParameters = new VignetteParameters()
     {
         apertureSize = 0.6f,
         featheringEffect = 0.3f,
-        easeInTime = 0.1f, 
-        easeOutTime = 0.5f, 
+        easeInTime = 0.1f,
+        easeOutTime = 0.5f,
         vignetteColor = Color.red,
         vignetteColorBlend = new Color(1f, 0f, 0f, 0.5f)
     };
@@ -27,42 +26,41 @@ public class PlayerAcceptPunch : MonoBehaviour, ITunnelingVignetteProvider
 
     public void ReactToPunch()
     {
-        PunchCounter++;
+        if (PunchCounter >= 3) return;
 
-        if (PunchCounter > 3) return;
+        PunchCounter++;
 
         if (audioSource != null && punchDialogueClip != null)
         {
             audioSource.PlayOneShot(punchDialogueClip);
         }
 
-        if (vignetteController != null)
+        if (redVignetteController != null)
         {
-            vignetteController.gameObject.SetActive(true);
+            redVignetteController.gameObject.SetActive(true);
 
             if (PunchCounter < 3)
             {
-                vignetteController.BeginTunnelingVignette(this);
-
+                redVignetteController.BeginTunnelingVignette(this);
                 CancelInvoke("HideHurtVision");
-
                 Invoke("HideHurtVision", 1.0f);
             }
             else if (PunchCounter == 3)
             {
                 CancelInvoke("HideHurtVision");
-                vignetteController.BeginTunnelingVignette(this);
 
-                Debug.Log("<color=red>Player knocked out! Hurt vision locked ON.</color>");
+                redVignetteController.BeginTunnelingVignette(this);
+
+                Debug.Log("<color=red>Player knocked out! Red vision locked ON permanently.</color>");
             }
         }
     }
 
     private void HideHurtVision()
     {
-        if (vignetteController != null)
+        if (redVignetteController != null)
         {
-            vignetteController.EndTunnelingVignette(this);
+            redVignetteController.EndTunnelingVignette(this);
         }
     }
 }

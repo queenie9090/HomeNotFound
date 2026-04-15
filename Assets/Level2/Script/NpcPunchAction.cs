@@ -16,14 +16,14 @@ public class NpcPunchAction : MonoBehaviour
     public float turnSpeed = 5f;
     public float punchWaitTime = 2.0f;
 
-    private Vector3 originalPosition; // Re-add this
+    private Vector3 originalPosition;
     private Quaternion originalRotation;
     private bool isAttacking = false;
 
 
     void Start()
     {
-        // Remember which way they were facing when the game started
+        // Remember which way they were facing
         originalRotation = transform.rotation;
         originalPosition = transform.position; 
     }
@@ -42,7 +42,7 @@ public class NpcPunchAction : MonoBehaviour
 
         playerAcceptPunch.ReactToPunch();
 
-        // 1. Turn to face the player instantly
+        // Turn to face the player 
         Vector3 directionToPlayer = (playerHead.position - transform.position).normalized;
         directionToPlayer.y = 0; // Keep them standing straight
         if (directionToPlayer != Vector3.zero)
@@ -50,35 +50,30 @@ public class NpcPunchAction : MonoBehaviour
             transform.rotation = Quaternion.LookRotation(directionToPlayer);
         }
 
-        // 2. Play the voice line 
         if (audioSource != null && punchDialogueClip != null)
         {
             audioSource.PlayOneShot(punchDialogueClip);
         }
 
-        // 3. Trigger the punch animation
         if (animator != null)
         {
             animator.SetTrigger("Punch");
         }
 
-        // 4. Wait for the punch animation to finish playing
         yield return new WaitForSeconds(punchWaitTime);
 
-        // 5. Smoothly rotate back to the original facing direction
+
         while (Quaternion.Angle(transform.rotation, originalRotation) > 0.1f)
         {
             transform.rotation = Quaternion.Slerp(transform.rotation, originalRotation, Time.deltaTime * turnSpeed);
             yield return null;
         }
 
-        // 6. Snap to exact original rotation just to be perfectly aligned
         transform.rotation = originalRotation;
         transform.position = originalPosition;
 
         isAttacking = false;
 
-        // 7. Tell the main script we are done so it can unlock and resume chatting!
         if (mainScript != null)
         {
             mainScript.ResumeNormalActivity();

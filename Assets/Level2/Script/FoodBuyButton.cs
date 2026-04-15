@@ -35,7 +35,6 @@ public class FoodBuyButton : MonoBehaviour
         );
     }
 
-    // Called by XR Interaction
     public void OnRaySelect()
     {
         transform.localPosition = initialPos - new Vector3(0, 0, pressDepth);

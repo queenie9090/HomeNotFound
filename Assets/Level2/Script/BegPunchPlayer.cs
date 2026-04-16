@@ -36,6 +36,8 @@ public class BegPunchPlayer : MonoBehaviour
     public AudioClip giveClip;
     public AudioClip rejectClip;
     public AudioClip screamClip;
+    public AudioClip kachingClip;
+
 
     [Header("State Tracking")]
     public bool canInteract = false;
@@ -176,12 +178,17 @@ public class BegPunchPlayer : MonoBehaviour
         {
             Level2Manager.Instance.AddMoney(Random.Range(1, 6));
             if (animator) animator.SetTrigger("Give");
-            if (audioSource) audioSource.PlayOneShot(giveClip);
+
+            if (audioSource)
+            {
+                if (giveClip) audioSource.PlayOneShot(giveClip);
+                if (kachingClip) audioSource.PlayOneShot(kachingClip);
+            }
         }
         else
         {
             if (animator) animator.SetTrigger("Reject");
-            if (audioSource) audioSource.PlayOneShot(rejectClip);
+            if (audioSource && rejectClip) audioSource.PlayOneShot(rejectClip);
         }
     }
 

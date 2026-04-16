@@ -1,8 +1,6 @@
 ﻿using UnityEngine;
 using TMPro;
 using System.Collections;
-using UnityEngine.UI; 
-using UnityEngine.SceneManagement; 
 
 public class DogAiInLv3 : MonoBehaviour
 {
@@ -19,7 +17,7 @@ public class DogAiInLv3 : MonoBehaviour
     public float moveSpeed = 5f;
     public float rotationSpeed = 8f;
     public float stopDistance = 1.5f;
-    public LayerMask obstacleMask; 
+    public LayerMask obstacleMask; // <--- ADD THIS LINE HERE
 
     [Header("Wander")]
     public float wanderRadius = 5f;
@@ -41,11 +39,6 @@ public class DogAiInLv3 : MonoBehaviour
     private bool goToStayPoint = false;
     private Transform currentStayPoint;
 
-    private bool hasCompletedDogTask = false;
-
-    [Header("Ending Sequence")]
-    public CanvasGroup fadeScreen; 
-    public string endSceneName = "EndScene"; //Type the name
     void Start()
     {
         if (anim == null)
@@ -54,8 +47,6 @@ public class DogAiInLv3 : MonoBehaviour
         cachedBone = GameObject.FindGameObjectWithTag("Bone");
         if (npc != null) npcDetector = npc.GetComponent<NpcBoneDetector>();
         PickNewWanderTarget();
-
-        if (fadeScreen != null) fadeScreen.alpha = 0f;
     }
 
     void Update()
@@ -109,15 +100,6 @@ public class DogAiInLv3 : MonoBehaviour
         {
             if (npcDetector != null && npcDetector.isTargetedByDog)
             {
-                if (!hasCompletedDogTask)
-                {
-                    if (JournalInLv3.Instance != null)
-                    {
-                        JournalInLv3.Instance.CompleteTask(0);
-                    }
-                    hasCompletedDogTask = true; 
-                }
-
                 anim.SetBool("isRunning", true);
                 anim.SetBool("isWaiting", false);
                 PursueTarget(npc.position);
@@ -233,66 +215,17 @@ public class DogAiInLv3 : MonoBehaviour
         }
         else if (currentStayPoint == stayPoint2)
         {
-            StartCoroutine(PlayDialogueSequence(3, 3));
+            if (snatchDialogue.Length > 3)
+                DialogueManager.Instance.ShowDialogue(snatchDialogue[3]);
         }
     }
 
     IEnumerator PlayDialogueSequence(int startIndex, int count)
+{
+    for (int i = startIndex; i < startIndex + count && i < snatchDialogue.Length; i++)
     {
-        for (int i = startIndex; i < startIndex + count && i < snatchDialogue.Length; i++)
-        {
-            DialogueManager.Instance.ShowDialogue(snatchDialogue[i]);
-            yield return new WaitForSeconds(3f); // time between dialogue lines
-
-            if (startIndex == 3)
-            {
-                StartCoroutine(EyeBlinkSequence());
-            }
-        }
-
-        
+        DialogueManager.Instance.ShowDialogue(snatchDialogue[i]);
+        yield return new WaitForSeconds(3f); // time between dialogue lines
     }
-    IEnumerator EyeBlinkSequence()
-    {
-        if (fadeScreen == null)
-        {
-            Debug.LogWarning("Fade Screen is missing! Just loading scene.");
-            SceneManager.LoadScene(endSceneName);
-            yield break;
-        }
-
-        // Blink 1 (Fast)
-        yield return StartCoroutine(FadeToBlack(1f, 0.5f)); // Eyes close
-        yield return new WaitForSeconds(0.2f);
-        yield return StartCoroutine(FadeToBlack(0f, 0.3f)); // Eyes open
-        yield return new WaitForSeconds(0.3f);
-
-        // Blink 2 (Slower)
-        yield return StartCoroutine(FadeToBlack(1f, 0.8f)); // Eyes close
-        yield return new WaitForSeconds(0.3f);
-        yield return StartCoroutine(FadeToBlack(0f, 0.5f)); // Eyes open
-        yield return new WaitForSeconds(0.5f);
-
-        // Final Close (Very slow, passing out)
-        yield return StartCoroutine(FadeToBlack(1f, 2.5f)); // Eyes close for good
-        yield return new WaitForSeconds(1f); // Wait in darkness
-
-        // Load the End Scene
-        SceneManager.LoadScene(endSceneName);
-    }
-
-    IEnumerator FadeToBlack(float targetAlpha, float duration)
-    {
-        float startAlpha = fadeScreen.alpha;
-        float time = 0;
-
-        while (time < duration)
-        {
-            time += Time.deltaTime;
-            fadeScreen.alpha = Mathf.Lerp(startAlpha, targetAlpha, time / duration);
-            yield return null; // wait until next frame
-        }
-
-        fadeScreen.alpha = targetAlpha; // Ensure it perfectly hits the target
-    }
+}
 }

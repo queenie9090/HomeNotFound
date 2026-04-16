@@ -27,19 +27,21 @@ public class StoleDetector : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if(audioSource != null && deadSound != null)
-            audioSource.PlayOneShot(deadSound);
+        if (other.CompareTag("Player")){
+            if (audioSource != null && deadSound != null)
+                audioSource.PlayOneShot(deadSound);
 
-        stoleDialogue.moneyStole = true;
+            stoleDialogue.moneyStole = true;
 
-        DialogueManager.Instance.ShowDialogue("What's that sound?! Better go check on the guy just now!");
+            DialogueManager.Instance.ShowDialogue("What's that sound?! Better go check on the guy just now!");
 
-        if(bagger1 != null && bagger2 != null)
-        {
-            bagger1.SetActive(false);
-            bagger2.SetActive(true);
+            if (bagger1 != null && bagger2 != null)
+            {
+                bagger1.SetActive(false);
+                bagger2.SetActive(true);
+            }
+
+            Destroy(gameObject);
         }
-
-        Destroy(gameObject);
     }
 }

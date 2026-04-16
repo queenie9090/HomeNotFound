@@ -5,6 +5,7 @@ public class BaggerTrigger : MonoBehaviour
 {
 
     public bool moneyStole = false;
+    public bool hasTriggered = false;
 
     private void OnTriggerEnter(Collider other)
     {
@@ -12,13 +13,15 @@ public class BaggerTrigger : MonoBehaviour
         {
             if (moneyStole)
                 StartCoroutine(StoleDialogueSequence());
-            else
+            else if(!hasTriggered)
                 StartCoroutine(DialogueSequence());
         }
     }
 
     IEnumerator DialogueSequence()
     {
+        hasTriggered = true;
+
         DialogueManager.Instance.ShowDialogue("Damn man...");
 
         yield return new WaitForSeconds(2.5f);

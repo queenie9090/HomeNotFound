@@ -15,8 +15,6 @@ public class NpcBoneDetector : MonoBehaviour
     private int currentWaypointIndex = 0;
     private bool isRunning = false;
 
-    private bool hasCompletedNpcTask = false;
-
     private void Start()
     {
         // Automatically try to find the animator if not assigned
@@ -39,15 +37,6 @@ public class NpcBoneDetector : MonoBehaviour
         {
             isTargetedByDog = true;
             isRunning = true;
-
-            if (!hasCompletedNpcTask)
-            {
-                if (JournalInLv3.Instance != null)
-                {
-                    JournalInLv3.Instance.CompleteTask(1); 
-                }
-                hasCompletedNpcTask = true;
-            }
 
             // TRIGGER ANIMATION
             if (anim != null) anim.SetBool("isChasing", true);

@@ -16,7 +16,10 @@ public class FoodBuyButton : MonoBehaviour
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip clickSound;
-    public AudioClip failSound; 
+    public AudioClip failSound;
+
+    private float lastPressTime = 0f;
+    public float pressCooldown = 0.5f;
 
     private Vector3 initialPos;
 
@@ -37,6 +40,10 @@ public class FoodBuyButton : MonoBehaviour
 
     public void OnRaySelect()
     {
+        // block the event spam
+        if (Time.time < lastPressTime + pressCooldown) return;
+        lastPressTime = Time.time;
+
         transform.localPosition = initialPos - new Vector3(0, 0, pressDepth);
 
         if (audioSource != null && clickSound != null)
@@ -48,16 +55,16 @@ public class FoodBuyButton : MonoBehaviour
             return;
         }
 
-
         // Not enough money
         if (manager.playerMoney < foodCost)
         {
             if (audioSource != null && failSound != null)
                 audioSource.PlayOneShot(failSound);
 
-            return; 
+            return;
         }
 
+        // Spawn food 
         if (foodPrefab != null)
         {
             foodPrefab.SetActive(true);

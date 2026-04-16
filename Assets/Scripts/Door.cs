@@ -7,24 +7,12 @@ public class Door : MonoBehaviour
     public float speed = 2f;
 
     private bool isOpen = false;
-    private bool playerHandInside = false;
 
     public DogAiInLv3 dog;
     public Transform stayPoint2;
 
-    void Start()
-    {
-        Debug.Log("Script started");
-    }
-
     void Update()
     {
-        if (Input.GetKeyDown(KeyCode.G))
-        {
-            Debug.Log("G pressed");
-            ToggleDoor();
-        }
-
         Quaternion targetRotation = isOpen ?
             Quaternion.Euler(0, openAngle, 0) :
             Quaternion.Euler(0, 0, 0);
@@ -32,41 +20,24 @@ public class Door : MonoBehaviour
         door.localRotation = Quaternion.Lerp(door.localRotation, targetRotation, Time.deltaTime * speed);
     }
 
+    void OnTriggerStay(Collider other)
+    {
+        if (other.CompareTag("Hand") && Input.GetKeyDown(KeyCode.G))
+        {
+            ToggleDoor();
+        }
+    }
+
     void ToggleDoor()
     {
-        isOpen = !isOpen;
+        if (isOpen) return;
 
-        if (isOpen)
-        {
-            Debug.Log("Door is OPEN");
+        isOpen = true;
+        Debug.Log("Door opened");
 
-            // Tell dog to move to second stay point
-            if (dog != null && stayPoint2 != null)
-            {
-                dog.GoToStayPoint(stayPoint2);
-            }
-        }
-        else
+        if (dog != null && stayPoint2 != null)
         {
-            Debug.Log("Door is CLOSED");
-        }
-    }
-
-    void OnTriggerEnter(Collider other)
-    {
-        if (other.CompareTag("Hand"))
-        {
-            playerHandInside = true;
-            Debug.Log("Hand touched the door handle");
-        }
-    }
-
-    void OnTriggerExit(Collider other)
-    {
-        if (other.CompareTag("Hand"))
-        {
-            playerHandInside = false;
-            Debug.Log("Hand left the door handle");
+            dog.GoToStayPoint(stayPoint2);
         }
     }
 }

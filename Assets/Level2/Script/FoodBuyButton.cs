@@ -10,6 +10,9 @@ public class FoodBuyButton : MonoBehaviour
     public float returnSpeed = 5f;
     public int foodCost = 25;
 
+    public GameObject foodPrefab;
+    private bool boughtFood = false;
+
     [Header("Audio")]
     public AudioSource audioSource;
     public AudioClip clickSound;
@@ -20,6 +23,7 @@ public class FoodBuyButton : MonoBehaviour
     void Start()
     {
         initialPos = transform.localPosition;
+        foodPrefab.SetActive(false);
     }
 
     void Update()
@@ -31,13 +35,19 @@ public class FoodBuyButton : MonoBehaviour
         );
     }
 
-    // Called by XR Interaction
     public void OnRaySelect()
     {
         transform.localPosition = initialPos - new Vector3(0, 0, pressDepth);
 
         if (audioSource != null && clickSound != null)
             audioSource.PlayOneShot(clickSound);
+
+        if (boughtFood)
+        {
+            DialogueManager.Instance.ShowDialogue("Don't waste money on extra food...");
+            return;
+        }
+
 
         // Not enough money
         if (manager.playerMoney < foodCost)
@@ -46,6 +56,12 @@ public class FoodBuyButton : MonoBehaviour
                 audioSource.PlayOneShot(failSound);
 
             return; 
+        }
+
+        if (foodPrefab != null)
+        {
+            foodPrefab.SetActive(true);
+            boughtFood = true;
         }
 
         manager.DecreaseMoney(foodCost);

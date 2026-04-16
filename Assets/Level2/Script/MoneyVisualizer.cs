@@ -17,9 +17,9 @@ public class MoneyVisualizer : MonoBehaviour
     [Header("Grid & Display Settings")]
     public Transform displayParent;
     [Tooltip("How many bills can fit in a single column before starting a new one")]
-    public int maxItemsPerColumn = 4; // YOUR NEW CONTROL VARIABLE
-    public float ySpacing = 0.15f;    // Spacing going UP
-    public float xSpacing = 0.15f;    // Spacing going RIGHT
+    public int maxItemsPerColumn = 4;
+    public float ySpacing = 0.15f;   
+    public float xSpacing = 0.15f;   
 
     [Header("Pooling Settings")]
     public int initialPoolSize = 5;
@@ -79,7 +79,7 @@ public class MoneyVisualizer : MonoBehaviour
 
         int numRM1 = totalMoney / 1;
 
-        // Instead of distance, we now track the total COUNT of money spawned
+     
         int currentItemIndex = 0;
 
         currentItemIndex = ManagePool(rm10Pool, rm10Prefab, numRM10, currentItemIndex);
@@ -105,23 +105,22 @@ public class MoneyVisualizer : MonoBehaviour
                 GameObject obj = pool[i];
                 obj.SetActive(true);
 
-                // --- GRID MATH ---
-                // Divide the index by max items to figure out which column we are in
+           
                 int columnIndex = currentIndex / maxItemsPerColumn;
 
-                // Use modulo (%) to figure out how high up we are in that specific column
+        
                 int positionInColumn = currentIndex % maxItemsPerColumn;
 
                 float targetX = columnIndex * xSpacing;
                 float targetY = positionInColumn * ySpacing;
 
-                // Apply the calculated position
+        
                 obj.transform.localPosition = new Vector3(targetX, targetY, 0);
 
                 obj.transform.localRotation = Quaternion.Euler(270f, 0f, 0f);
                 obj.transform.localScale = moneyScale;
 
-                currentIndex++; // Move on to the next item
+                currentIndex++; 
             }
             else
             {
@@ -129,6 +128,6 @@ public class MoneyVisualizer : MonoBehaviour
             }
         }
 
-        return currentIndex; // Pass the updated count to the next pool
+        return currentIndex; 
     }
 }

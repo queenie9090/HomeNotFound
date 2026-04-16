@@ -22,6 +22,7 @@ public class StealMoney : MonoBehaviour
         if (audioSource != null && takeSound != null)
             audioSource.PlayOneShot(takeSound);
 
+        if(stole != null)
         stole.setActiveStole();
 
         manager.AddMoney(6);

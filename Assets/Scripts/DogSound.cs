@@ -1,12 +1,11 @@
 using UnityEngine;
-using UnityEngine.AI;
 
 public class DogSound : MonoBehaviour
 {
     public AudioSource audioSource;
 
     public AudioClip barkingSound;
-    public AudioClip pantingSound;
+    public AudioClip pantingSound; // Used for both stopping and sitting
 
     public Transform player;
     public float detectionRange = 10f;
@@ -18,39 +17,35 @@ public class DogSound : MonoBehaviour
     {
         float distance = Vector3.Distance(transform.position, player.position);
 
-        // CHASE
         if (distance < detectionRange)
         {
             if (!isChasing)
             {
-                PlayBark();
+                PlaySound(barkingSound);
                 isChasing = true;
             }
         }
-        // STOP CHASE
-        else if (distance > stopRange)
+        
+        else if (distance > stopRange || isChasing == false)
         {
-            if (isChasing)
+            if (isChasing || !audioSource.isPlaying || audioSource.clip != pantingSound)
             {
-                PlayPanting();
+                PlaySound(pantingSound);
                 isChasing = false;
             }
         }
     }
 
-    void PlayBark()
+    void PlaySound(AudioClip clip)
     {
-        audioSource.Stop();
-        audioSource.loop = true;
-        audioSource.clip = barkingSound;
-        audioSource.Play();
-    }
+        if (clip == null) return;
 
-    void PlayPanting()
-    {
+        // If the clip is already playing, don't interrupt it
+        if (audioSource.clip == clip && audioSource.isPlaying) return;
+
         audioSource.Stop();
+        audioSource.clip = clip;
         audioSource.loop = true;
-        audioSource.clip = pantingSound;
         audioSource.Play();
     }
 }

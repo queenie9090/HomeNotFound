@@ -13,7 +13,6 @@ public class StoleDetector : MonoBehaviour
     public AudioSource audioSource;
     public AudioClip deadSound;
 
-    // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
     {
         gameObject.SetActive(false);
@@ -27,12 +26,12 @@ public class StoleDetector : MonoBehaviour
 
     void OnTriggerEnter(Collider other)
     {
-        if (other.CompareTag("Player")){
+        if (other.CompareTag("Player"))
+        {
             if (audioSource != null && deadSound != null)
                 audioSource.PlayOneShot(deadSound);
 
             stoleDialogue.moneyStole = true;
-
             DialogueManager.Instance.ShowDialogue("What's that sound?! Better go check on the guy just now!");
 
             if (bagger1 != null && bagger2 != null)
@@ -41,7 +40,17 @@ public class StoleDetector : MonoBehaviour
                 bagger2.SetActive(true);
             }
 
-            Destroy(gameObject);
+            Collider myCollider = GetComponent<Collider>();
+            if (myCollider != null) myCollider.enabled = false;
+
+            Invoke("DisableThisObject", 3f);
         }
     }
+
+    void DisableThisObject()
+    {
+        gameObject.SetActive(false);
+
+    }
+
 }

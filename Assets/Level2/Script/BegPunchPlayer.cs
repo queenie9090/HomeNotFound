@@ -93,7 +93,7 @@ public class BegPunchPlayer : MonoBehaviour
         Vector3 npcPos = transform.position;
         Vector3 playerPos = playerHead.position;
         npcPos.y = 0; playerPos.y = 0;
-
+       // Debug.Log("<color=cyan>Checking for begging.</color>");
         float distToNPC = Vector3.Distance(playerPos, npcPos);
         float handDist = Vector3.Distance(leftHand.position, rightHand.position);
 

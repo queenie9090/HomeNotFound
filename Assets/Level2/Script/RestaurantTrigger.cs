@@ -24,6 +24,7 @@ public class RestaurantTrigger : MonoBehaviour
             if (gm.currentState == Level2Manager.GameState.EnterLevel)
             {
                 gm.SetState(Level2Manager.GameState.NeedMoney);
+                JournalManager.Instance.CompleteTask(0);
                 DialogueManager.Instance.ShowDialogue("RM 12.5 for a bowl of rice?!");
                 outsideTrigger.SetActive(true);
             }

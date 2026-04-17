@@ -19,6 +19,30 @@ public class MissionManager : MonoBehaviour
         "I need to earn some money to buy more food."
     };
 
+    [Header("Save Settings")]
+    [Tooltip("The level number the player JUST unlocked. If this is the end of Level 1, type 2 here.")]
+    public int levelToUnlock = 2;
+
+    [Tooltip("The exact name of your Main Menu scene")]
+    public string mainMenuSceneName = "MainMenu";
+
+    public void SaveAndExitToMenu()
+    {
+        int currentSavedLevel = PlayerPrefs.GetInt("UnlockedLevel", 1);
+
+        // 2. Only overwrite the save if this new level is HIGHER.
+        // (This stops a player who is re-playing Level 1 from accidentally deleting their Level 3 save!)
+        if (levelToUnlock > currentSavedLevel)
+        {
+            PlayerPrefs.SetInt("UnlockedLevel", levelToUnlock);
+            PlayerPrefs.Save();
+
+            Debug.Log($"<color=green>Progress Saved! Player unlocked Level {levelToUnlock}</color>");
+        }
+
+        SceneManager.LoadScene(mainMenuSceneName);
+    }
+
     void Awake()
     {
         Instance = this;
@@ -58,7 +82,8 @@ public class MissionManager : MonoBehaviour
             if (clothDone && dogDone)
             {
                 // Everything is done! Go to Level 2
-                SceneManager.LoadScene("Level 2");
+                SaveAndExitToMenu();
+
             }
             else
             {

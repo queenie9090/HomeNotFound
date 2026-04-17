@@ -69737,7 +69737,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: Assembly-CSharp::StealPunchPlayer
   moneyTrue: {fileID: 12270026}
   moneyFalse: {fileID: 473198983}
-  trigger: {fileID: 966951778}
+  trigger: {fileID: 0}
 --- !u!1 &1481316347
 GameObject:
   m_ObjectHideFlags: 0

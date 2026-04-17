@@ -87,18 +87,25 @@ public class PauseManager : MonoBehaviour
     {
         isPaused = !isPaused;
 
-        // Ensure the panel exists before toggling
-        if (pauseMenuPanel != null)
+        if (isPaused)
         {
-            pauseMenuPanel.SetActive(isPaused);
+            // When pausing, always show the main pause menu first
+            pauseMenuPanel.SetActive(true);
+            settingsPanel.SetActive(false);
+        }
+        else
+        {
+            // When resuming, hide EVERYTHING
+            pauseMenuPanel.SetActive(false);
+            settingsPanel.SetActive(false);
         }
 
         Time.timeScale = isPaused ? 0f : 1f;
-        Debug.Log("<color=yellow>[PauseManager]</color> Button Pressed. Paused: " + isPaused);
+        Debug.Log("<color=yellow>[PauseManager]</color> Paused: " + isPaused);
     }
 
 
-public void ResetLevel()
+    public void ResetLevel()
     {
         Time.timeScale = 1f;
         Debug.Log("<color=orange>[PauseManager]</color> Resetting Level...");

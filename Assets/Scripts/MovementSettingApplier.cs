@@ -1,6 +1,7 @@
 using UnityEngine;
 using UnityEngine.XR.Interaction.Toolkit.Locomotion;
 using Unity.XR.CoreUtils;
+using System.Collections;
 
 public class MovementSettingApplier : MonoBehaviour
 {
@@ -14,9 +15,17 @@ public class MovementSettingApplier : MonoBehaviour
     public GameObject tunnelingVignetteObject;
     public GameObject xrOrigin;
 
+    // We need to declare this here so the whole script can use it!
+    private XROrigin originComponent;
+
     void Start()
     {
-        // Run everything once when the level loads
+        // Get the component once at the start
+        if (xrOrigin != null)
+        {
+            originComponent = xrOrigin.GetComponent<XROrigin>();
+        }
+
         ApplySettings();
         ApplyAudioSettings();
     }
@@ -42,28 +51,57 @@ public class MovementSettingApplier : MonoBehaviour
         }
 
         // 4. Seated Mode Logic
+        // 4. Seated Mode Logic
         int isSeated = PlayerPrefs.GetInt("SeatedMode", 0);
-        XROrigin origin = xrOrigin.GetComponent<XROrigin>();
 
-        if (origin != null)
+        if (originComponent != null)
         {
             if (isSeated == 1)
             {
-                origin.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Device;
-                // Set this to a height that is clearly different from your standing height
-                origin.CameraYOffset =2.5f;
+                originComponent.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Device;
+                originComponent.CameraYOffset = 2.7f;
             }
             else
             {
-                origin.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
-                // When switching back to floor, the offset usually doesn't matter, 
-                // but some setups prefer it at 0
-                origin.CameraYOffset = 2.0f;
+                originComponent.RequestedTrackingOriginMode = XROrigin.TrackingOriginMode.Floor;
+                originComponent.CameraYOffset = 0f;
             }
+
+            // Start the coroutine properly
+            StartCoroutine(ForceHeightOffset(isSeated));
         }
 
-            Debug.Log($"[Real-Time] Settings: Move {moveMode}, Turn {turnMode}, Vig {vignetteOn}, Seated {isSeated}");
+        Debug.Log($"[Real-Time] Settings applied. Seated: {isSeated}");
     }
+    // Moved OUTSIDE of ApplySettings
+    IEnumerator ForceHeightOffset(int isSeated)
+    {
+        yield return new WaitForEndOfFrame();
+
+        if (originComponent != null && originComponent.CameraFloorOffsetObject != null)
+        {
+            if (isSeated == 0)
+                originComponent.CameraFloorOffsetObject.transform.localPosition = new Vector3(0, 1.2f, 0);
+            else
+                originComponent.CameraFloorOffsetObject.transform.localPosition = Vector3.zero;
+        }
+    }
+
+    void LateUpdate()
+    {
+        // This is the "Brute Force" safety net
+        int isSeated = PlayerPrefs.GetInt("SeatedMode", 0);
+
+        if (originComponent != null && isSeated == 0)
+        {
+            if (originComponent.CameraFloorOffsetObject != null)
+            {
+                // We keep forcing it to 1.5f so the VR hardware can't reset it to 0
+                originComponent.CameraFloorOffsetObject.transform.localPosition = new Vector3(0, 1.2f, 0);
+            }
+        }
+    }
+
 
     void ApplyAudioSettings()
     {

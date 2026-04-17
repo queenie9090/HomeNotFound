@@ -89348,7 +89348,7 @@ MonoBehaviour:
   npc: {fileID: 1503834270}
   dog: {fileID: 577848628}
   stayPoint1: {fileID: 1191693585}
-  door: {fileID: 0}
+  door: {fileID: 578667005}
 --- !u!4 &7187746973725329779
 Transform:
   m_ObjectHideFlags: 0

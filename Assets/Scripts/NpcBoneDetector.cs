@@ -12,6 +12,8 @@ public class NpcBoneDetector : MonoBehaviour
     public float runSpeed = 0.5f;
     public float rotationSpeed = 2f;
 
+    public static bool npcDistracted = false;
+
     private int currentWaypointIndex = 0;
     private bool isRunning = false;
 
@@ -39,6 +41,8 @@ public class NpcBoneDetector : MonoBehaviour
         {
             isTargetedByDog = true;
             isRunning = true;
+
+            npcDistracted = true;
 
             if (!hasCompletedNpcTask)
             {

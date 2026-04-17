@@ -7,6 +7,9 @@ public class XRWeighingScale : MonoBehaviour
     [Header("UI")]
     public TextMeshProUGUI displayText;
 
+    public AudioClip sellSound;
+    public AudioSource audioSource;
+
     [Header("Settings")]
     public string itemTag = "RecycleItem";
 
@@ -60,6 +63,8 @@ public class XRWeighingScale : MonoBehaviour
         if (totalValue <= 0) return;
 
         Level2Manager.Instance.AddMoney(totalValue);
+        if (audioSource != null && sellSound != null)
+            audioSource.PlayOneShot(sellSound);
 
         foreach (var item in items)
         {

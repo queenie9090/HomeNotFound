@@ -23,7 +23,7 @@ public class StealPunchPlayer : MonoBehaviour
         }
         else
         {
-            moneyTrue.SetActive(false);
+            //moneyTrue.SetActive(false);
             moneyFalse.SetActive(true);
         }
 

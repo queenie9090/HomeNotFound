@@ -41,8 +41,6 @@ public class DogAiInLv3 : MonoBehaviour
     private bool goToStayPoint = false;
     private Transform currentStayPoint;
 
-    private bool hasCompletedDogTask = false;
-
     [Header("Ending Sequence")]
     public CanvasGroup fadeScreen; 
     public string endSceneName = "EndScene"; //Type the name
@@ -109,15 +107,6 @@ public class DogAiInLv3 : MonoBehaviour
         {
             if (npcDetector != null && npcDetector.isTargetedByDog)
             {
-                if (!hasCompletedDogTask)
-                {
-                    if (JournalInLv3.Instance != null)
-                    {
-                        JournalInLv3.Instance.CompleteTask(0);
-                    }
-                    hasCompletedDogTask = true; 
-                }
-
                 anim.SetBool("isRunning", true);
                 anim.SetBool("isWaiting", false);
                 PursueTarget(npc.position);

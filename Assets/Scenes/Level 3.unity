@@ -23113,6 +23113,7 @@ GameObject:
   m_Component:
   - component: {fileID: 578667004}
   - component: {fileID: 578667005}
+  - component: {fileID: 578667006}
   m_Layer: 0
   m_Name: DoorHinge
   m_TagString: Untagged
@@ -23154,6 +23155,27 @@ MonoBehaviour:
   speed: 2
   dog: {fileID: 577848628}
   stayPoint2: {fileID: 1782664742}
+--- !u!65 &578667006
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 578667002}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 1
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.6516418, y: 2.997233, z: 1.1385255}
+  m_Center: {x: 0.7707825, y: 0.99861646, z: 0.44100404}
 --- !u!1 &580657007
 GameObject:
   m_ObjectHideFlags: 0
@@ -26421,7 +26443,7 @@ PrefabInstance:
       objectReference: {fileID: 0}
     - target: {fileID: 6598815579406187037, guid: 18ddb545287c546e19cc77dc9fbb2189, type: 3}
       propertyPath: m_IsActive
-      value: 1
+      value: 0
       objectReference: {fileID: 0}
     m_RemovedComponents: []
     m_RemovedGameObjects: []
@@ -70151,7 +70173,7 @@ AudioSource:
   Priority: 128
   DopplerLevel: 1
   MinDistance: 1
-  MaxDistance: 202
+  MaxDistance: 20
   Pan2D: 0
   rolloffMode: 1
   BypassEffects: 0
@@ -77346,6 +77368,7 @@ GameObject:
   - component: {fileID: 6231027464629414509}
   - component: {fileID: 6585821937284175406}
   - component: {fileID: 1560748560283009714}
+  - component: {fileID: 6585821937284175407}
   m_Layer: 0
   m_Name: BarnDoor_04
   m_TagString: Untagged
@@ -77640,6 +77663,27 @@ MeshFilter:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 4690360174170489511}
   m_Mesh: {fileID: -6977425600975974712, guid: 89247685defa97942abac8a5061c02a8, type: 3}
+--- !u!65 &6585821937284175407
+BoxCollider:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 4690360174170489511}
+  m_Material: {fileID: 0}
+  m_IncludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_ExcludeLayers:
+    serializedVersion: 2
+    m_Bits: 0
+  m_LayerOverridePriority: 0
+  m_IsTrigger: 0
+  m_ProvidesContacts: 0
+  m_Enabled: 1
+  serializedVersion: 3
+  m_Size: {x: 1.0668, y: 2.1336, z: 0}
+  m_Center: {x: 0, y: 1.0667995, z: 0.017512351}
 --- !u!4 &6634998500581501299
 Transform:
   m_ObjectHideFlags: 0

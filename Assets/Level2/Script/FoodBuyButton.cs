@@ -12,6 +12,7 @@ public class FoodBuyButton : MonoBehaviour
 
     public GameObject foodPrefab;
     private bool boughtFood = false;
+    public AudioClip foodSpawnSound;
 
     [Header("Audio")]
     public AudioSource audioSource;
@@ -69,6 +70,8 @@ public class FoodBuyButton : MonoBehaviour
         {
             foodPrefab.SetActive(true);
             boughtFood = true;
+            if (audioSource != null && foodSpawnSound != null)
+                audioSource.PlayOneShot(foodSpawnSound);
         }
 
         manager.DecreaseMoney(foodCost);

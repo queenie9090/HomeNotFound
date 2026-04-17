@@ -5,6 +5,9 @@ public class StealMoney : MonoBehaviour
 {
     public Level2Manager manager;
     public StoleDetector stole;
+    public StealPunchPlayer spp;
+
+    public bool peekingRemy = false;
 
     [Header("Audio")]
     public AudioSource audioSource;
@@ -27,6 +30,14 @@ public class StealMoney : MonoBehaviour
 
         manager.AddMoney(6);
 
-        Destroy(gameObject);
+        gameObject.SetActive(false);
+
+        if(peekingRemy)
+        {
+            if(spp != null)
+            {
+                spp.SetNotActive();
+            }
+        }
     }
 }

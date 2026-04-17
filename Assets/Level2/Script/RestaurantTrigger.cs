@@ -39,10 +39,7 @@ public class RestaurantTrigger : MonoBehaviour
                 Debug.Log("Dialog should display");
                 gm.SetState(Level2Manager.GameState.DiscoveredPriceIncreased);
             }
-            else if (gm.currentState == Level2Manager.GameState.CanBuyFood)
-            {
-                gm.SetState(Level2Manager.GameState.LevelComplete);
-            }
+
         }
     }
 }

@@ -9,6 +9,7 @@ public class ShowerTemperature : MonoBehaviour
     public GameObject npc;
     public DogAiInLv3 dog;
     public Transform stayPoint1;
+    public Door door; 
 
     private bool isWaterRunning = false;
 
@@ -67,11 +68,17 @@ public class ShowerTemperature : MonoBehaviour
             {
                 dog.GoToStayPoint(stayPoint1);
             }
+
+            if (door != null)
+            {
+                door.EnableDogTrigger();
+            }
         }
         else
         {
             waterParticles.Stop();
             Debug.Log("Shower turned OFF");
         }
+
     }
 }

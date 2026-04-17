@@ -7,6 +7,7 @@ public class Door : MonoBehaviour
     public float speed = 2f;
 
     private bool isOpen = false;
+    private bool canTriggerDog = false;
 
     public DogAiInLv3 dog;
     public Transform stayPoint2;
@@ -43,8 +44,8 @@ public class Door : MonoBehaviour
         isOpen = true;
         Debug.Log("Door opened");
 
-        // Your dog logic stays here
-        if (dog != null && stayPoint2 != null)
+        // ONLY trigger dog AFTER shower
+        if (canTriggerDog && dog != null && stayPoint2 != null)
         {
             dog.GoToStayPoint(stayPoint2);
         }
@@ -56,5 +57,11 @@ public class Door : MonoBehaviour
 
         isOpen = false;
         Debug.Log("Door closed");
+    }
+
+    public void EnableDogTrigger()
+    {
+        canTriggerDog = true;
+        Debug.Log("Dog can now be triggered by door");
     }
 }

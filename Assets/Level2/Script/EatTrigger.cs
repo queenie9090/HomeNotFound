@@ -8,6 +8,7 @@ public class EatTrigger : MonoBehaviour
     public GameObject endPath;
     public GameObject food;
     public GameObject hurtVenette;
+    public GameObject lightSign;
 
     void OnTriggerEnter(Collider other)
     {
@@ -20,6 +21,7 @@ public class EatTrigger : MonoBehaviour
             endPath.SetActive(false);
             hurtVenette.SetActive(false);
             food.SetActive(false);
+            lightSign.SetActive(true);
         }
     }
 

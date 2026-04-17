@@ -98,7 +98,8 @@ public class Level2Manager : MonoBehaviour
                 foodPrice = 25;
                 Debug.Log("Dialog should display");
                 SetState(GameState.PriceIncreased);
-                
+                JournalManager.Instance.CompleteTask(1);
+                JournalManager.Instance.CompleteTask(0);
 
             }
             else if (currentState == GameState.DiscoveredPriceIncreased)
@@ -106,6 +107,9 @@ public class Level2Manager : MonoBehaviour
                 DialogueManager.Instance.ShowDialogue("Finally! I have enough money! Lets go check out that Mamak again!");
                 Debug.Log("Dialog should display");
                 SetState(GameState.CanBuyFood);
+                JournalManager.Instance.CompleteTask(1);
+                JournalManager.Instance.CompleteTask(0);
+
             }
         }
     }

@@ -4,6 +4,8 @@ public class Level2Manager : MonoBehaviour
 {
     public static Level2Manager Instance;
 
+    public JournalManager journalManager2;
+
     public enum GameState
     {
         EnterLevel,
@@ -107,8 +109,8 @@ public class Level2Manager : MonoBehaviour
                 DialogueManager.Instance.ShowDialogue("Finally! I have enough money! Lets go check out that Mamak again!");
                 Debug.Log("Dialog should display");
                 SetState(GameState.CanBuyFood);
-                JournalManager.Instance.CompleteTask(1);
-                JournalManager.Instance.CompleteTask(0);
+       
+                journalManager2.CompleteTask(0);
 
             }
         }

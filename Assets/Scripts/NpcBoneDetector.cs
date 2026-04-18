@@ -9,8 +9,8 @@ public class NpcBoneDetector : MonoBehaviour
 
     [Header("Running Settings")]
     public Transform[] waypoints;
-    public float runSpeed = 0.5f;
-    public float rotationSpeed = 2f;
+    public float runSpeed = 2f;
+    public float rotationSpeed = 5f;
 
     [Header("Audio")]
     public AudioSource mainAudio;

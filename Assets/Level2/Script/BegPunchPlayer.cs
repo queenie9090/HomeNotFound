@@ -86,6 +86,7 @@ public class BegPunchPlayer : MonoBehaviour
         return Time.time > lastActionTime + actionCooldown;
     }
 
+    /*
     void CheckForBegging()
     {
         if (leftHand == null || rightHand == null || playerHead == null) return;
@@ -93,7 +94,7 @@ public class BegPunchPlayer : MonoBehaviour
         Vector3 npcPos = transform.position;
         Vector3 playerPos = playerHead.position;
         npcPos.y = 0; playerPos.y = 0;
-
+       // Debug.Log("<color=cyan>Checking for begging.</color>");
         float distToNPC = Vector3.Distance(playerPos, npcPos);
         float handDist = Vector3.Distance(leftHand.position, rightHand.position);
 
@@ -120,6 +121,77 @@ public class BegPunchPlayer : MonoBehaviour
             }
         }
 
+    }
+    
+
+
+    void CheckForBegging()
+    {
+        if (leftHand == null || rightHand == null || playerHead == null) return;
+
+        Vector3 npcPos = transform.position;
+        Vector3 playerPos = playerHead.position;
+        npcPos.y = 0; playerPos.y = 0;
+
+        float distToNPC = Vector3.Distance(playerPos, npcPos);
+        float handDist = Vector3.Distance(leftHand.position, rightHand.position);
+
+        bool isInRange = distToNPC < begDistance;
+        bool isHandsTogether = handDist < handsTogetherThreshold;
+        bool readyToAct = Time.time > lastActionTime + actionCooldown;
+
+        // 1. TRIGGER BEGGING
+        if (isInRange && isHandsTogether)
+        {
+            if (!hasBeggedThisTime && readyToAct)
+            {
+                ExecuteBeggingLogic();
+                hasBeggedThisTime = true; // Lock it until they reset
+                Debug.Log("<color=cyan>Begging Locked.</color>");
+            }
+        }
+        // 2. UNLOCK BEGGING (Improved Logic)
+        // Now it unlocks if they walk away OR if they just pull their hands apart!
+        else if (!isInRange || !isHandsTogether)
+        {
+            if (hasBeggedThisTime)
+            {
+                hasBeggedThisTime = false;
+                Debug.Log("<color=white>Begging Unlocked.</color> (Hands separated or stepped back)");
+            }
+        }
+    }
+    */
+
+    void CheckForBegging()
+    {
+        // We don't need the player head or NPC position anymore!
+        if (leftHand == null || rightHand == null) return;
+
+        float handDist = Vector3.Distance(leftHand.position, rightHand.position);
+
+        bool isHandsTogether = handDist < handsTogetherThreshold;
+        bool readyToAct = Time.time > lastActionTime + actionCooldown;
+
+        // 1. TRIGGER BEGGING
+        if (isHandsTogether)
+        {
+            if (!hasBeggedThisTime && readyToAct)
+            {
+                ExecuteBeggingLogic();
+                hasBeggedThisTime = true;
+                Debug.Log("<color=cyan>Begging Locked.</color>");
+            }
+        }
+        // 2. UNLOCK BEGGING
+        else if (!isHandsTogether)
+        {
+            if (hasBeggedThisTime)
+            {
+                hasBeggedThisTime = false;
+                Debug.Log("<color=white>Begging Unlocked.</color> (Hands separated)");
+            }
+        }
     }
 
     public void OnPunch(ActionBasedController controller)

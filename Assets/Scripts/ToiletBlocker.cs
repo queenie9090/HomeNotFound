@@ -3,48 +3,47 @@ using UnityEngine;
 public class ToiletBlocker : MonoBehaviour
 {
     public Animator npcAnim;
-
-    public AudioSource idleSound;
-    public AudioSource hitSound;
+   
 
     private bool hasTriggered = false;
 
-    void Start()
-    {
-        // Make sure idle sound is playing
-        if (idleSound != null && !idleSound.isPlaying)
-        {
-            idleSound.Play();
-        }
-    }
-
     void OnTriggerEnter(Collider other)
     {
-        if (!other.CompareTag("Player")) return;
+
+        if (!other.CompareTag("Hand")) return;
 
         if (!NpcBoneDetector.npcDistracted && !hasTriggered)
         {
             hasTriggered = true;
 
-            Debug.Log("NPC hits player!");
+            Debug.Log("NPC attacks!");
 
-            // Stop idle sound
-            if (idleSound != null)
-            {
-                idleSound.Stop();
-            }
-
-            // Play hit sound
-            if (hitSound != null)
-            {
-                hitSound.Play();
-            }
-
-            // Play animation
             if (npcAnim != null)
             {
-                npcAnim.SetTrigger("Hit");
+                // FIXED: Changed SetTrigger("Hit") to SetBool("isAttacking", true)
+                npcAnim.SetBool("isAttacking", true);
+
+                // NEW: Turn off the animation after 1.5 seconds so it doesn't loop forever
+                Invoke(nameof(ResetAttackAnimation), 1.5f);
+            }
+
+            // Play the sound
+            NpcBoneDetector detector = npcAnim.GetComponent<NpcBoneDetector>();
+            if (detector != null)
+            {
+                detector.PlayWarningSound();
             }
         }
+    }
+
+    void ResetAttackAnimation()
+    {
+        if (npcAnim != null)
+        {
+            // Turn the boolean off to return to Idle
+            npcAnim.SetBool("isAttacking", false);
+        }
+
+        hasTriggered = false; 
     }
 }

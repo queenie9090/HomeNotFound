@@ -6,6 +6,9 @@ public class StealPunchPlayer : MonoBehaviour
 
     public GameObject moneyTrue;
     public GameObject moneyFalse;
+    public GameObject trigger;
+
+    private bool stoleMoney = false;
 
     // Start is called once before the first execution of Update after the MonoBehaviour is created
     void Start()
@@ -14,8 +17,19 @@ public class StealPunchPlayer : MonoBehaviour
         moneyFalse.SetActive(true);
     }
 
+    public void SetNotActive()
+    {
+        moneyTrue.SetActive(false);
+        moneyFalse.SetActive(false);
+        trigger.SetActive(false);
+        stoleMoney = true;
+    }
+
     public void SetCanSteal(bool canSteal)
     {
+        if (stoleMoney)
+            return;
+
         if(canSteal)
             {
             moneyTrue.SetActive(true);
@@ -23,7 +37,7 @@ public class StealPunchPlayer : MonoBehaviour
         }
         else
         {
-            //moneyTrue.SetActive(false);
+            moneyTrue.SetActive(false);
             moneyFalse.SetActive(true);
         }
 

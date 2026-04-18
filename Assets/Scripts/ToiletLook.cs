@@ -2,18 +2,17 @@ using UnityEngine;
 
 public class ToiletLock : MonoBehaviour
 {
-    public Collider blockerCollider; // drag your wall collider here
+    public Collider blockerCollider; 
 
     void Update()
     {
-        // Lock before task, unlock after task
         if (NpcBoneDetector.npcDistracted)
         {
-            blockerCollider.enabled = false; // allow player in
+            blockerCollider.enabled = false; 
         }
         else
         {
-            blockerCollider.enabled = true; // block player
+            blockerCollider.enabled = true; 
         }
     }
 }

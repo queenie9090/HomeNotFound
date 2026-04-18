@@ -5,7 +5,7 @@ public class DogSound : MonoBehaviour
     public AudioSource audioSource;
 
     public AudioClip barkingSound;
-    public AudioClip pantingSound; // Used for both stopping and sitting
+    public AudioClip pantingSound; 
 
     public Transform player;
     public float detectionRange = 10f;
@@ -40,7 +40,6 @@ public class DogSound : MonoBehaviour
     {
         if (clip == null) return;
 
-        // If the clip is already playing, don't interrupt it
         if (audioSource.clip == clip && audioSource.isPlaying) return;
 
         audioSource.Stop();

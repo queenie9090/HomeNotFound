@@ -43,7 +43,7 @@ public class DogAiInLv3 : MonoBehaviour
 
     [Header("Ending Sequence")]
     public CanvasGroup fadeScreen; 
-    public string endSceneName = "EndScene"; //Type the name
+    public string endSceneName = "EndScene";
     void Start()
     {
         if (anim == null)
@@ -81,7 +81,7 @@ public class DogAiInLv3 : MonoBehaviour
                 else if (currentStayPoint == stayPoint2)
                 {
                     anim.SetBool("isWaiting", false);
-                    anim.SetBool("isSitting", true); // trigger sitting animation
+                    anim.SetBool("isSitting", true); 
                 }
 
                 if (!dialogueShown)
@@ -100,7 +100,6 @@ public class DogAiInLv3 : MonoBehaviour
 
         if (blocked)
         {
-            // SPIN if hitting wall or edge
             transform.Rotate(Vector3.up * rotationSpeed * 15f * Time.deltaTime);
         }
         else
@@ -218,7 +217,7 @@ public class DogAiInLv3 : MonoBehaviour
     {
         if (currentStayPoint == stayPoint1)
         {
-            StartCoroutine(PlayDialogueSequence(0, 3)); // show element 0,1,2
+            StartCoroutine(PlayDialogueSequence(0, 3)); 
         }
         else if (currentStayPoint == stayPoint2)
         {
@@ -231,7 +230,7 @@ public class DogAiInLv3 : MonoBehaviour
         for (int i = startIndex; i < startIndex + count && i < snatchDialogue.Length; i++)
         {
             DialogueManager.Instance.ShowDialogue(snatchDialogue[i]);
-            yield return new WaitForSeconds(3f); // time between dialogue lines
+            yield return new WaitForSeconds(3f); 
 
             if (startIndex == 3)
             {
@@ -250,21 +249,18 @@ public class DogAiInLv3 : MonoBehaviour
             yield break;
         }
 
-        // Blink 1 (Fast)
-        yield return StartCoroutine(FadeToBlack(1f, 0.5f)); // Eyes close
+        yield return StartCoroutine(FadeToBlack(1f, 0.5f)); 
         yield return new WaitForSeconds(0.2f);
-        yield return StartCoroutine(FadeToBlack(0f, 0.3f)); // Eyes open
+        yield return StartCoroutine(FadeToBlack(0f, 0.3f)); 
         yield return new WaitForSeconds(0.3f);
 
-        // Blink 2 (Slower)
-        yield return StartCoroutine(FadeToBlack(1f, 0.8f)); // Eyes close
+        yield return StartCoroutine(FadeToBlack(1f, 0.8f)); 
         yield return new WaitForSeconds(0.3f);
-        yield return StartCoroutine(FadeToBlack(0f, 0.5f)); // Eyes open
+        yield return StartCoroutine(FadeToBlack(0f, 0.5f)); 
         yield return new WaitForSeconds(0.5f);
 
-        // Final Close (Very slow, passing out)
-        yield return StartCoroutine(FadeToBlack(1f, 2.5f)); // Eyes close for good
-        yield return new WaitForSeconds(1f); // Wait in darkness
+        yield return StartCoroutine(FadeToBlack(1f, 2.5f)); 
+        yield return new WaitForSeconds(1f); 
 
         // Load the End Scene
         SceneManager.LoadScene(endSceneName);
@@ -279,9 +275,9 @@ public class DogAiInLv3 : MonoBehaviour
         {
             time += Time.deltaTime;
             fadeScreen.alpha = Mathf.Lerp(startAlpha, targetAlpha, time / duration);
-            yield return null; // wait until next frame
+            yield return null; 
         }
 
-        fadeScreen.alpha = targetAlpha; // Ensure it perfectly hits the target
+        fadeScreen.alpha = targetAlpha; 
     }
 }

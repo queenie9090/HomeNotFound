@@ -4,6 +4,7 @@ using UnityEngine.XR.Interaction.Toolkit;
 public class FoodBuyButton : MonoBehaviour
 {
     public Level2Manager manager;
+    public JournalManager journalManager2;
 
     [Header("Button Animation")]
     public float pressDepth = 0.02f;
@@ -69,6 +70,7 @@ public class FoodBuyButton : MonoBehaviour
         if (foodPrefab != null)
         {
             foodPrefab.SetActive(true);
+            journalManager2.CompleteTask(1);
             boughtFood = true;
             if (audioSource != null && foodSpawnSound != null)
                 audioSource.PlayOneShot(foodSpawnSound);

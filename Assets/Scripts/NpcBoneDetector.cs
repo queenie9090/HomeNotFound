@@ -5,7 +5,7 @@ public class NpcBoneDetector : MonoBehaviour
     public bool isTargetedByDog = false;
 
     [Header("Animation")]
-    public Animator anim; // Drag your NPC's Animator here
+    public Animator anim; 
 
     [Header("Running Settings")]
     public Transform[] waypoints;
@@ -35,7 +35,6 @@ public class NpcBoneDetector : MonoBehaviour
 
     private void Start()
     {
-        // Automatically try to find the animator if not assigned
         if (anim == null) anim = GetComponent<Animator>();
 
         PlayIdleSound();
@@ -45,7 +44,6 @@ public class NpcBoneDetector : MonoBehaviour
     {
         if (collision.gameObject.CompareTag("Bone"))
         {
-            // NEW: Destroy the bone so it disappears
             Destroy(collision.gameObject);
             StartRunning();
         }
@@ -55,7 +53,6 @@ public class NpcBoneDetector : MonoBehaviour
     {
         if (other.CompareTag("Bone"))
         {
-            // NEW: Destroy the bone so it disappears
             Destroy(other.gameObject);
             StartRunning();
         }
@@ -63,7 +60,6 @@ public class NpcBoneDetector : MonoBehaviour
 
     void OnTriggerStay(Collider other)
     {
-        // FIXED: If the NPC is already distracted and running, ignore the player entirely
         if (isRunning) return;
 
         if (other.CompareTag("Player"))
@@ -116,7 +112,6 @@ public class NpcBoneDetector : MonoBehaviour
             isRunning = true;
             npcDistracted = true;
 
-            // FIXED: Stop hit sounds just in case they were punching when distracted
             isWarningPlaying = false;
             StopHitLoop();
 
@@ -150,7 +145,6 @@ public class NpcBoneDetector : MonoBehaviour
     {
         Transform target = waypoints[currentWaypointIndex];
 
-        // Rotation and Move logic
         Vector3 dir = (target.position - transform.position).normalized;
         dir.y = 0;
         if (dir != Vector3.zero)
@@ -161,12 +155,10 @@ public class NpcBoneDetector : MonoBehaviour
 
         transform.Translate(Vector3.forward * runSpeed * Time.deltaTime);
 
-        // Check if the NPC has reached the current waypoint
         if (Vector3.Distance(transform.position, target.position) < 1.0f)
         {
             currentWaypointIndex++;
 
-            // Loop back to the first waypoint if we reached the end
             if (currentWaypointIndex >= waypoints.Length)
             {
                 currentWaypointIndex = 0;

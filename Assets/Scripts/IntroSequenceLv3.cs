@@ -10,7 +10,6 @@ public class IntroSequenceLv3 : MonoBehaviour
 
     IEnumerator ExecuteIntro()
     {
-        // 1. Start in the dark
         yield return new WaitForSeconds(1.0f);
         DialogueManager.Instance.ShowDialogue("It's evening.");
 
@@ -28,6 +27,5 @@ public class IntroSequenceLv3 : MonoBehaviour
         yield return new WaitForSeconds(3f);
         DialogueManager.Instance.ShowDialogue("But I think I need to get rid of that damn janitor first");
 
-        // At this point, the player is fully "in" the game and looking for the Journal.
     }
 }

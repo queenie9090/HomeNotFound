@@ -13,6 +13,10 @@ public class JournalInLv3 : MonoBehaviour
     [Header("Tasks List")]
     public List<JournalTask> tasks = new List<JournalTask>();
 
+    [Header("Level Obstruction Settings")]
+    // Drag your "TeleportationFloor" collider here
+    public Collider teleportBlockingCollider;
+
     private int currentTaskIndex = 0;
 
     void Awake()
@@ -30,6 +34,12 @@ public class JournalInLv3 : MonoBehaviour
         if (index == currentTaskIndex && index < tasks.Count)
         {
             tasks[index].isDone = true;
+            if (index == 1 && teleportBlockingCollider != null)
+            {
+                // To "reopen", we DISABLE the collider that was blocking the ray
+                teleportBlockingCollider.enabled = false;
+                Debug.Log("Janitor gone! Area opened.");
+            }
             currentTaskIndex++; // unlock next task
             RefreshJournal();
         }
